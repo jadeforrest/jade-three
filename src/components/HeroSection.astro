@@ -1,0 +1,39 @@
+---
+interface Props {
+  artistName: string;
+}
+const { artistName } = Astro.props;
+---
+<section
+  class="relative flex flex-col items-center justify-center text-center py-28 px-6 overflow-hidden"
+  style="background: radial-gradient(ellipse at center, #2d1f4a 0%, #0a0a0f 70%);"
+>
+  <!-- Subtle decorative ring -->
+  <div
+    class="absolute inset-0 pointer-events-none"
+    aria-hidden="true"
+    style="background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(124,77,189,0.08) 0%, transparent 70%);"
+  ></div>
+
+  <p class="font-display text-xs font-medium uppercase tracking-[0.25em] text-accent mb-5 relative">
+    Music
+  </p>
+
+  <h1 class="font-display text-5xl sm:text-7xl font-bold text-text-primary leading-none tracking-tight relative">
+    {artistName}
+  </h1>
+
+  <p class="mt-6 text-text-muted text-base max-w-sm relative">
+    Electronic downtempo soundscapes from Portland, Oregon.
+  </p>
+
+  <a
+    href="#releases"
+    class="mt-10 inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-accent/40 text-sm font-medium text-accent hover:bg-accent/10 transition-colors duration-200 relative"
+  >
+    Listen
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 5v14M5 12l7 7 7-7"/>
+    </svg>
+  </a>
+</section>

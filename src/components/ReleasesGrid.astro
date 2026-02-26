@@ -1,0 +1,56 @@
+---
+import AlbumCard from './AlbumCard.astro';
+import SingleCard from './SingleCard.astro';
+import type { Release } from '../types/releases';
+
+interface Props {
+  releases: Release[];
+}
+
+const { releases } = Astro.props;
+
+const albums = releases.filter(r => r.type === 'album').sort(
+  (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
+);
+const singles = releases.filter(r => r.type === 'single').sort(
+  (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
+);
+---
+<div class="space-y-20">
+  <!-- Albums -->
+  {albums.length > 0 && (
+    <section>
+      <h2 class="font-display text-xs font-semibold uppercase tracking-widest text-text-muted mb-8">
+        Albums
+      </h2>
+      <div class="space-y-8">
+        {albums.map(release => (
+          <AlbumCard release={release} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Separator -->
+  {albums.length > 0 && singles.length > 0 && (
+    <div class="flex items-center gap-4">
+      <div class="flex-1 h-px bg-gradient-to-r from-transparent via-accent-dim to-transparent opacity-30"></div>
+      <span class="text-accent-dim text-lg" aria-hidden="true">✦</span>
+      <div class="flex-1 h-px bg-gradient-to-r from-transparent via-accent-dim to-transparent opacity-30"></div>
+    </div>
+  )}
+
+  <!-- Singles -->
+  {singles.length > 0 && (
+    <section>
+      <h2 class="font-display text-xs font-semibold uppercase tracking-widest text-text-muted mb-8">
+        Singles
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {singles.map(release => (
+          <SingleCard release={release} />
+        ))}
+      </div>
+    </section>
+  )}
+</div>

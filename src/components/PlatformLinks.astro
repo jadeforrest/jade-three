@@ -1,0 +1,71 @@
+---
+import SpotifyIcon from './icons/SpotifyIcon.astro';
+import AppleMusicIcon from './icons/AppleMusicIcon.astro';
+import AmazonMusicIcon from './icons/AmazonMusicIcon.astro';
+import YouTubeIcon from './icons/YouTubeIcon.astro';
+
+interface Props {
+  spotifyUrl: string;
+  appleMusicUrl: string | null;
+  amazonMusicUrl: string | null;
+  youtubeUrl: string | null;
+  size?: number;
+  class?: string;
+}
+
+const {
+  spotifyUrl,
+  appleMusicUrl,
+  amazonMusicUrl,
+  youtubeUrl,
+  size = 20,
+  class: className = '',
+} = Astro.props;
+---
+<div class:list={['flex items-center gap-3', className]}>
+  <a
+    href={spotifyUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="text-text-muted hover:text-spotify transition-colors duration-200"
+    title="Listen on Spotify"
+  >
+    <SpotifyIcon size={size} />
+  </a>
+
+  {appleMusicUrl && (
+    <a
+      href={appleMusicUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-text-muted hover:text-apple transition-colors duration-200"
+      title="Listen on Apple Music"
+    >
+      <AppleMusicIcon size={size} />
+    </a>
+  )}
+
+  {amazonMusicUrl && (
+    <a
+      href={amazonMusicUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-text-muted hover:text-amazon transition-colors duration-200"
+      title="Listen on Amazon Music"
+    >
+      <AmazonMusicIcon size={size} />
+    </a>
+  )}
+
+  {youtubeUrl && (
+    <a
+      href={youtubeUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-text-muted hover:text-youtube transition-colors duration-200"
+      title="Watch on YouTube"
+    >
+      <YouTubeIcon size={size} />
+    </a>
+  )}
+</div>

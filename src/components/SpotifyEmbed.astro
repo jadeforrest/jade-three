@@ -1,0 +1,31 @@
+---
+interface Props {
+  spotifyId: string;
+  type: 'album' | 'track';
+  height?: number;
+}
+const { spotifyId, type, height } = Astro.props;
+const resolvedHeight = height ?? (type === 'album' ? 352 : 152);
+
+// Spotify IDs are exactly 22 base62 characters. Skip the embed for placeholders.
+const isValidId = /^[A-Za-z0-9]{22}$/.test(spotifyId);
+const src = `https://open.spotify.com/embed/${type}/${spotifyId}?utm_source=generator&theme=0`;
+---
+{isValidId ? (
+  <iframe
+    src={src}
+    width="100%"
+    height={resolvedHeight}
+    frameborder="0"
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    loading="lazy"
+    class="rounded-lg w-full block"
+  ></iframe>
+) : (
+  <div
+    class="rounded-lg w-full flex items-center justify-center bg-elevated text-text-muted text-xs"
+    style={`height: ${resolvedHeight}px`}
+  >
+    Player unavailable
+  </div>
+)}

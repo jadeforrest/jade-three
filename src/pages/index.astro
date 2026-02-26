@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import HeroSection from '../components/HeroSection.astro';
+import ReleasesGrid from '../components/ReleasesGrid.astro';
+import releasesData from '../data/releases.json';
+import type { ReleasesData } from '../types/releases';
+
+const data = releasesData as ReleasesData;
+---
+<BaseLayout
+  title="Jade Three — Music"
+  description="Electronic downtempo soundscapes from Portland, Oregon. Music by Jade Three."
+>
+  <Header />
+
+  <main>
+    <HeroSection artistName={data.artistName} />
+
+    <section id="releases" class="max-w-5xl mx-auto px-6 py-16">
+      <ReleasesGrid releases={data.releases} />
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

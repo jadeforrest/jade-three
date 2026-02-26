@@ -1,0 +1,47 @@
+---
+import PlatformLinks from './PlatformLinks.astro';
+import type { Track } from '../types/releases';
+
+interface Props {
+  track: Track;
+  index: number;
+}
+
+const { track, index } = Astro.props;
+---
+<div class:list={[
+  'flex items-center gap-3 px-3 py-2 rounded-md group transition-colors duration-150',
+  index % 2 === 0 ? 'bg-transparent' : 'bg-surface/40',
+  'hover:bg-elevated'
+]}>
+  <!-- Track number -->
+  <span class="w-6 text-right text-xs text-text-muted shrink-0 tabular-nums">
+    {track.trackNumber}
+  </span>
+
+  <!-- Title + explicit badge -->
+  <div class="flex items-center gap-2 flex-1 min-w-0">
+    <span class="text-sm text-text-primary truncate">{track.title}</span>
+    {track.isExplicit && (
+      <span class="text-[10px] font-medium px-1 py-0.5 rounded bg-muted text-text-muted shrink-0 uppercase tracking-wide">
+        E
+      </span>
+    )}
+  </div>
+
+  <!-- Platform links (small, appear on hover) -->
+  <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0">
+    <PlatformLinks
+      spotifyUrl={track.spotifyUrl}
+      appleMusicUrl={track.appleMusicUrl}
+      amazonMusicUrl={track.amazonMusicUrl}
+      youtubeUrl={track.youtubeUrl}
+      size={14}
+    />
+  </div>
+
+  <!-- Duration -->
+  <span class="text-xs text-text-muted shrink-0 tabular-nums w-10 text-right">
+    {track.durationFormatted}
+  </span>
+</div>

@@ -1,0 +1,67 @@
+{
+  "lastUpdated": "2026-02-26",
+  "artistName": "Jade Three",
+  "spotifyArtistId": "2T04y62jXdLsznulD3sT4D",
+  "releases": [
+    {
+      "id": "album-PLACEHOLDER_1",
+      "type": "album",
+      "title": "Picking My Bones",
+      "releaseDate": "2025-01-01",
+      "year": 2025,
+      "spotifyId": "SPOTIFY_ID_PLACEHOLDER",
+      "spotifyUrl": "https://open.spotify.com/album/SPOTIFY_ID_PLACEHOLDER",
+      "appleMusicUrl": null,
+      "amazonMusicUrl": null,
+      "youtubePlaylistUrl": null,
+      "youtubeUrl": null,
+      "artworkUrl": "",
+      "artworkUrlSmall": "",
+      "totalTracks": 1,
+      "tracks": [
+        {
+          "trackNumber": 1,
+          "title": "Picking My Bones",
+          "spotifyId": "SPOTIFY_TRACK_PLACEHOLDER",
+          "spotifyUrl": "https://open.spotify.com/track/SPOTIFY_TRACK_PLACEHOLDER",
+          "appleMusicUrl": null,
+          "amazonMusicUrl": null,
+          "youtubeUrl": null,
+          "durationMs": 0,
+          "durationFormatted": "—",
+          "isExplicit": false
+        }
+      ]
+    },
+    {
+      "id": "single-PLACEHOLDER_2",
+      "type": "single",
+      "title": "Didn't you want something?",
+      "releaseDate": "2024-01-01",
+      "year": 2024,
+      "spotifyId": "SPOTIFY_ID_PLACEHOLDER_2",
+      "spotifyUrl": "https://open.spotify.com/album/SPOTIFY_ID_PLACEHOLDER_2",
+      "appleMusicUrl": null,
+      "amazonMusicUrl": null,
+      "youtubePlaylistUrl": null,
+      "youtubeUrl": null,
+      "artworkUrl": "",
+      "artworkUrlSmall": "",
+      "totalTracks": 1,
+      "tracks": [
+        {
+          "trackNumber": 1,
+          "title": "Didn't you want something?",
+          "spotifyId": "SPOTIFY_TRACK_PLACEHOLDER_2",
+          "spotifyUrl": "https://open.spotify.com/track/SPOTIFY_TRACK_PLACEHOLDER_2",
+          "appleMusicUrl": null,
+          "amazonMusicUrl": null,
+          "youtubeUrl": null,
+          "durationMs": 0,
+          "durationFormatted": "—",
+          "isExplicit": false
+        }
+      ]
+    }
+  ]
+}

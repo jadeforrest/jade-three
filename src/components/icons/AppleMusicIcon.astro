@@ -1,0 +1,19 @@
+---
+interface Props {
+  class?: string;
+  size?: number;
+}
+const { class: className = '', size = 20 } = Astro.props;
+---
+<svg
+  role="img"
+  viewBox="0 0 24 24"
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  fill="currentColor"
+  class={className}
+  aria-label="Apple Music"
+>
+  <path d="M12.005.24C5.45.24.24 5.45.24 12.005S5.45 23.77 12.005 23.77 23.77 18.56 23.77 12.005 18.56.24 12.005.24zm3.057 5.1l-5.76 1.648v6.18a2.67 2.67 0 00-1.44-.42 2.682 2.682 0 100 5.364 2.682 2.682 0 002.682-2.682V9.072l4.518-1.29v4.55a2.67 2.67 0 00-1.44-.42 2.682 2.682 0 100 5.364 2.682 2.682 0 002.682-2.682V5.916a.552.552 0 00-.242-.576z"/>
+</svg>

@@ -1,0 +1,68 @@
+---
+import SpotifyEmbed from './SpotifyEmbed.astro';
+import PlatformLinks from './PlatformLinks.astro';
+import TrackRow from './TrackRow.astro';
+import type { Release } from '../types/releases';
+
+interface Props {
+  release: Release;
+}
+
+const { release } = Astro.props;
+const hasArtwork = release.artworkUrl && release.artworkUrl.length > 0;
+---
+<article class="bg-surface rounded-2xl overflow-hidden border border-white/5">
+  <!-- Album header -->
+  <div class="px-6 pt-6 pb-4 flex items-start justify-between gap-4">
+    <div>
+      <h3 class="font-display text-2xl font-semibold text-text-primary leading-tight">
+        {release.title}
+      </h3>
+      <p class="text-sm text-text-muted mt-1">
+        {release.year} &middot; {release.totalTracks} {release.totalTracks === 1 ? 'track' : 'tracks'}
+      </p>
+    </div>
+    <PlatformLinks
+      spotifyUrl={release.spotifyUrl}
+      appleMusicUrl={release.appleMusicUrl}
+      amazonMusicUrl={release.amazonMusicUrl}
+      youtubeUrl={release.youtubeUrl ?? release.youtubePlaylistUrl}
+      size={18}
+      class="pt-1 shrink-0"
+    />
+  </div>
+
+  <!-- Two-column body -->
+  <div class="px-6 pb-6 flex flex-col lg:flex-row gap-6">
+    <!-- Left: artwork (if available) + embed -->
+    <div class="lg:w-80 shrink-0 flex flex-col gap-3">
+      {hasArtwork && (
+        <img
+          src={release.artworkUrl}
+          alt={`${release.title} album artwork`}
+          width="320"
+          height="320"
+          class="w-full rounded-xl object-cover aspect-square"
+          loading="lazy"
+        />
+      )}
+      {!hasArtwork && (
+        <div class="w-full aspect-square rounded-xl bg-elevated flex items-center justify-center">
+          <span class="font-display text-4xl font-bold text-text-muted">
+            {release.title.charAt(0)}
+          </span>
+        </div>
+      )}
+      <SpotifyEmbed spotifyId={release.spotifyId} type="album" height={152} />
+    </div>
+
+    <!-- Right: track list -->
+    <div class="flex-1 min-w-0">
+      <div class="space-y-0.5">
+        {release.tracks.map((track, i) => (
+          <TrackRow track={track} index={i} />
+        ))}
+      </div>
+    </div>
+  </div>
+</article>
