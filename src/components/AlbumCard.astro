@@ -1,7 +1,6 @@
 ---
 import SpotifyEmbed from './SpotifyEmbed.astro';
 import PlatformLinks from './PlatformLinks.astro';
-import TrackRow from './TrackRow.astro';
 import type { Release } from '../types/releases';
 
 interface Props {
@@ -9,17 +8,24 @@ interface Props {
 }
 
 const { release } = Astro.props;
-const hasArtwork = release.artworkUrl && release.artworkUrl.length > 0;
+
+const typeLabel = release.type === 'ep' ? 'EP' : 'Album';
+const releaseDate = new Date(release.releaseDate + 'T12:00:00');
+const formattedDate = releaseDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
 ---
 <article class="bg-surface rounded-2xl overflow-hidden border border-white/5">
-  <!-- Album header -->
+  <!-- Header -->
   <div class="px-6 pt-6 pb-4 flex items-start justify-between gap-4">
     <div>
       <h3 class="font-display text-2xl font-semibold text-text-primary leading-tight">
         {release.title}
       </h3>
       <p class="text-sm text-text-muted mt-1">
-        {release.year} &middot; {release.totalTracks} {release.totalTracks === 1 ? 'track' : 'tracks'}
+        {typeLabel} &middot; {formattedDate}
       </p>
     </div>
     <PlatformLinks
@@ -32,40 +38,7 @@ const hasArtwork = release.artworkUrl && release.artworkUrl.length > 0;
     />
   </div>
 
-  <!-- Two-column body -->
-  <div class="px-6 pb-4 flex flex-col lg:flex-row gap-6">
-    <!-- Left: artwork -->
-    <div class="lg:w-80 shrink-0">
-      {hasArtwork && (
-        <img
-          src={release.artworkUrl}
-          alt={`${release.title} album artwork`}
-          width="320"
-          height="320"
-          class="w-full rounded-xl object-cover aspect-square"
-          loading="lazy"
-        />
-      )}
-      {!hasArtwork && (
-        <div class="w-full aspect-square rounded-xl bg-elevated flex items-center justify-center">
-          <span class="font-display text-4xl font-bold text-text-muted">
-            {release.title.charAt(0)}
-          </span>
-        </div>
-      )}
-    </div>
-
-    <!-- Right: track list -->
-    <div class="flex-1 min-w-0">
-      <div class="space-y-0.5">
-        {release.tracks.map((track, i) => (
-          <TrackRow track={track} index={i} />
-        ))}
-      </div>
-    </div>
-  </div>
-
-  <!-- Full-width embed -->
+  <!-- Embed -->
   <div class="px-6 pb-6">
     <SpotifyEmbed spotifyId={release.spotifyId} type="album" />
   </div>
