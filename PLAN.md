@@ -12,12 +12,12 @@ The long-term vision: music discovery hub + full artist homepage — bio, contac
 
 Goal: Every release shows correct artwork, a working Spotify embed, and real track data.
 
-- [ ] **1a.** Make sure we have all the releases — including the EP *Year Until the Fall* and any other missing releases
-- [ ] **1b.** Fix missing artwork for "Obey Early" and "Eh Ville" (empty `artworkUrl` / `artworkUrlSmall` in `releases.json`)
-- [ ] **1c.** Fix track durations and track-level Spotify IDs — 7/8 releases have `durationMs: 0`; track IDs are duplicates of album IDs. Root cause: Spotify API 403 errors (dev-mode quota). Resolve API access and re-run `npm run fetch-releases`.
-- [ ] **1d.** Make Spotify embeds more visually prominent — currently blends in; consider increased height or clearer labeling
-- [ ] **1e.** Verify Spotify-only platform links look intentional — other platforms conditionally hidden (correct), but check single-icon display doesn't look broken
-- [ ] **1f.** Update Playwright tests to cover any new releases and verify no regressions
+- [x] **1a.** Make sure we have all the releases — including the EP *Year Until the Fall* and any other missing releases
+- [x] **1b.** Fix missing artwork for "Obey Early" and "Eh Ville" (empty `artworkUrl` / `artworkUrlSmall` in `releases.json`)
+- [x] **1c.** Fix track durations and track-level Spotify IDs — real track IDs and durations populated for all singles and EP tracks.
+- [x] **1d.** Make Spotify embeds more visually prominent — AlbumCard embed now uses full 352px height
+- [x] **1e.** Verify Spotify-only platform links look intentional — single Spotify icon renders cleanly, no change needed
+- [x] **1f.** Update Playwright tests to cover any new releases and verify no regressions
 
 ---
 

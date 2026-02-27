@@ -33,19 +33,17 @@ test.describe('Jade Three homepage', () => {
     await expect(releases).toBeVisible();
   });
 
-  test('renders at least one release section heading (Albums or Singles)', async ({ page }) => {
-    await page.goto('/');
-    const albumsHeading = page.getByRole('heading', { name: /albums/i });
-    const singlesHeading = page.getByRole('heading', { name: /singles/i });
-    const hasAlbums = await albumsHeading.isVisible().catch(() => false);
-    const hasSingles = await singlesHeading.isVisible().catch(() => false);
-    expect(hasAlbums || hasSingles).toBe(true);
-  });
-
-  test('renders at least one release card', async ({ page }) => {
+  test('renders all 9 release cards', async ({ page }) => {
     await page.goto('/');
     const cards = page.locator('#releases article');
-    await expect(cards.first()).toBeVisible();
+    await expect(cards).toHaveCount(9);
+  });
+
+  test('renders the EP "Year Until the Fall" with its tracks', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: /year until the fall/i })).toBeVisible();
+    await expect(page.getByText('Fractional person')).toBeVisible();
+    await expect(page.getByText('Fight or flight')).toBeVisible();
   });
 
   test('each release card has a Spotify link', async ({ page }) => {
