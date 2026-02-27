@@ -8,7 +8,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://i.scdn.co https://mosaic.scdn.co https://lineup-images.scdn.co data: blob:; frame-src https://open.spotify.com; connect-src 'self';"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://i.scdn.co https://mosaic.scdn.co https://lineup-images.scdn.co https://image-cdn-fa.spotifycdn.com https://image-cdn-ak.spotifycdn.com data: blob:; frame-src https://open.spotify.com; connect-src 'self';"
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"

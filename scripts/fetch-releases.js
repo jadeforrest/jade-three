@@ -67,7 +67,10 @@ async function spotifyGet(token, path) {
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(`Spotify API error: ${res.status} ${url}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`Spotify API error: ${res.status} ${url}\n${body}`);
+  }
   return res.json();
 }
 
@@ -156,10 +159,18 @@ async function main() {
   const token = await getAccessToken(clientId, clientSecret);
 
   console.log(`Fetching releases for artist ${ARTIST_ID}...`);
-  const albumObjects = await fetchAllPages(
-    token,
-    `/v1/artists/${ARTIST_ID}/albums?include_groups=album,single&market=${MARKET}&limit=50`
-  );
+  let albumObjects;
+  try {
+    albumObjects = await fetchAllPages(
+      token,
+      `/artists/${ARTIST_ID}/albums?include_groups=album,single&market=${MARKET}&limit=50`
+    );
+  } catch (err) {
+    console.error(`\nFailed to fetch artist albums: ${err.message}`);
+    console.error('This is usually a Spotify developer-mode restriction.');
+    console.error('Make sure your Spotify account is added under User Management in the app settings at developer.spotify.com/dashboard');
+    process.exit(1);
+  }
 
   console.log(`Found ${albumObjects.length} releases. Fetching track data...`);
 
@@ -167,18 +178,16 @@ async function main() {
   const releases = [];
 
   for (const album of albumObjects) {
-    process.stdout.write(`  Fetching tracks for "${album.name}"...`);
+    process.stdout.write(`  Processing "${album.name}"...`);
 
-    // Fetch full album details (includes tracks + images)
-    const fullAlbum = await spotifyGet(token, `/v1/albums/${album.id}?market=${MARKET}`);
-    const trackItems = fullAlbum.tracks?.items ?? [];
-
-    // Fetch remaining pages of tracks if any
-    let nextTracksUrl = fullAlbum.tracks?.next;
-    while (nextTracksUrl) {
-      const page = await spotifyGet(token, nextTracksUrl);
-      trackItems.push(...page.items);
-      nextTracksUrl = page.next;
+    // Images and metadata come from the simplified album object in the list response.
+    // Track data requires an additional endpoint — attempt it but fall back gracefully
+    // if Spotify's development-mode restrictions block the call.
+    let trackItems = [];
+    try {
+      trackItems = await fetchAllPages(token, `/albums/${album.id}/tracks?limit=50`);
+    } catch (err) {
+      console.warn(`\n    Warning: could not fetch tracks (${err.message.split('\n')[0]}). Continuing without track list.`);
     }
 
     const manual = preserveManualUrls(existing, album.id);
@@ -212,9 +221,9 @@ async function main() {
       amazonMusicUrl: manual.amazonMusicUrl,
       youtubePlaylistUrl: manual.youtubePlaylistUrl,
       youtubeUrl: manual.youtubeUrl,
-      artworkUrl: bestArtworkUrl(fullAlbum.images),
-      artworkUrlSmall: smallArtworkUrl(fullAlbum.images),
-      totalTracks: fullAlbum.total_tracks ?? trackItems.length,
+      artworkUrl: bestArtworkUrl(album.images),
+      artworkUrlSmall: smallArtworkUrl(album.images),
+      totalTracks: album.total_tracks ?? trackItems.length,
       tracks,
     });
 
