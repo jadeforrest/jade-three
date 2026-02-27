@@ -23,11 +23,11 @@ Goal: Every release shows correct artwork, a working Spotify embed, and real tra
 
 ## Phase 2 — DNS + Hosting
 
-- [ ] **2a.** Confirm Netlify deploy is clean (build command: `npm run build`, publish: `dist`, Node 20)
-- [ ] **2b.** Choose and register custom domain
-- [ ] **2c.** Configure DNS (A/CNAME to Netlify), add domain in Netlify UI
-- [ ] **2d.** Update `site` in `astro.config.mjs` to real domain
-- [ ] **2e.** Verify HTTPS/SSL certificate
+- [x] **2a.** Confirm Netlify deploy is clean (build command: `npm run build`, publish: `dist`, Node 20)
+- [x] **2b.** Choose and register custom domain — jadethreemusic.com
+- [x] **2c.** Configure DNS (A/CNAME to Netlify), add domain in Netlify UI
+- [x] **2d.** Update `site` in `astro.config.mjs` to real domain
+- [x] **2e.** Verify HTTPS/SSL certificate
 
 ---
 
