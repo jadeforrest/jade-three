@@ -9,8 +9,7 @@ interface Props {
 
 const { release } = Astro.props;
 const hasArtwork = release.artworkUrl && release.artworkUrl.length > 0;
-// Use the release's album ID with type=album — individual track IDs not yet available.
-const embedId = release.spotifyId;
+const embedId = release.tracks[0]?.spotifyId ?? release.spotifyId;
 ---
 <article class="bg-surface rounded-2xl overflow-hidden border border-white/5 flex flex-col hover:-translate-y-0.5 transition-transform duration-200">
   <!-- Artwork -->
@@ -44,7 +43,7 @@ const embedId = release.spotifyId;
 
   <!-- Spotify embed (compact) -->
   <div class="px-4">
-    <SpotifyEmbed spotifyId={embedId} type="album" height={152} />
+    <SpotifyEmbed spotifyId={embedId} type="track" height={152} />
   </div>
 
   <!-- Platform links -->

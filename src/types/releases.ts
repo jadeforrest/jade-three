@@ -13,7 +13,7 @@ export interface Track {
 
 export interface Release {
   id: string;
-  type: 'album' | 'single';
+  type: 'album' | 'ep' | 'single';
   title: string;
   releaseDate: string;
   year: number;

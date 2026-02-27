@@ -9,48 +9,40 @@ interface Props {
 
 const { releases } = Astro.props;
 
-const albums = releases.filter(r => r.type === 'album').sort(
+// Sort all releases newest-first
+const sorted = [...releases].sort(
   (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
 );
-const singles = releases.filter(r => r.type === 'single').sort(
-  (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
-);
+
+// Group consecutive singles into grids; albums/EPs stay as individual full-width cards
+type MultiGroup = { kind: 'multi'; release: Release };
+type SingleGroup = { kind: 'singles'; releases: Release[] };
+type Group = MultiGroup | SingleGroup;
+
+const groups: Group[] = [];
+for (const release of sorted) {
+  if (release.type === 'single') {
+    const last = groups[groups.length - 1];
+    if (last?.kind === 'singles') {
+      last.releases.push(release);
+    } else {
+      groups.push({ kind: 'singles', releases: [release] });
+    }
+  } else {
+    groups.push({ kind: 'multi', release });
+  }
+}
 ---
-<div class="space-y-20">
-  <!-- Albums -->
-  {albums.length > 0 && (
-    <section>
-      <h2 class="font-display text-xs font-semibold uppercase tracking-widest text-text-muted mb-8">
-        Albums
-      </h2>
-      <div class="space-y-8">
-        {albums.map(release => (
-          <AlbumCard release={release} />
-        ))}
-      </div>
-    </section>
-  )}
-
-  <!-- Separator -->
-  {albums.length > 0 && singles.length > 0 && (
-    <div class="flex items-center gap-4">
-      <div class="flex-1 h-px bg-gradient-to-r from-transparent via-accent-dim to-transparent opacity-30"></div>
-      <span class="text-accent-dim text-lg" aria-hidden="true">✦</span>
-      <div class="flex-1 h-px bg-gradient-to-r from-transparent via-accent-dim to-transparent opacity-30"></div>
-    </div>
-  )}
-
-  <!-- Singles -->
-  {singles.length > 0 && (
-    <section>
-      <h2 class="font-display text-xs font-semibold uppercase tracking-widest text-text-muted mb-8">
-        Singles
-      </h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {singles.map(release => (
+<div class="space-y-8">
+  {groups.map(group => (
+    group.kind === 'multi' ? (
+      <AlbumCard release={group.release} />
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {group.releases.map(release => (
           <SingleCard release={release} />
         ))}
       </div>
-    </section>
-  )}
+    )
+  ))}
 </div>

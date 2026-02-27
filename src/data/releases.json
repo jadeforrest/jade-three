@@ -1,8 +1,62 @@
 {
-  "lastUpdated": "2026-02-26",
+  "lastUpdated": "2026-02-27",
   "artistName": "Jade Three",
   "spotifyArtistId": "2T04y62jXdLsznulD3sT4D",
   "releases": [
+    {
+      "id": "ep-7qUiYF0NhcV4epRkvR7LWn",
+      "type": "ep",
+      "title": "Year Until the Fall",
+      "releaseDate": "2025-11-03",
+      "year": 2025,
+      "spotifyId": "7qUiYF0NhcV4epRkvR7LWn",
+      "spotifyUrl": "https://open.spotify.com/album/7qUiYF0NhcV4epRkvR7LWn",
+      "appleMusicUrl": null,
+      "amazonMusicUrl": null,
+      "youtubePlaylistUrl": null,
+      "youtubeUrl": null,
+      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02da779378d03279b52a0c6701",
+      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273da779378d03279b52a0c6701",
+      "totalTracks": 3,
+      "tracks": [
+        {
+          "trackNumber": 1,
+          "title": "Year until the fall",
+          "spotifyId": "6RMA9PlyDKcmbBqsuXbZ3r",
+          "spotifyUrl": "https://open.spotify.com/track/6RMA9PlyDKcmbBqsuXbZ3r",
+          "appleMusicUrl": null,
+          "amazonMusicUrl": null,
+          "youtubeUrl": null,
+          "durationMs": 298666,
+          "durationFormatted": "4:58",
+          "isExplicit": false
+        },
+        {
+          "trackNumber": 2,
+          "title": "Fractional person",
+          "spotifyId": "05hOxu35DUjdAdOr6k8WXq",
+          "spotifyUrl": "https://open.spotify.com/track/05hOxu35DUjdAdOr6k8WXq",
+          "appleMusicUrl": null,
+          "amazonMusicUrl": null,
+          "youtubeUrl": null,
+          "durationMs": 285818,
+          "durationFormatted": "4:45",
+          "isExplicit": false
+        },
+        {
+          "trackNumber": 3,
+          "title": "Fight or flight",
+          "spotifyId": "7DVIgPMpkPzHS8jbMpt2Jz",
+          "spotifyUrl": "https://open.spotify.com/track/7DVIgPMpkPzHS8jbMpt2Jz",
+          "appleMusicUrl": null,
+          "amazonMusicUrl": null,
+          "youtubeUrl": null,
+          "durationMs": 190000,
+          "durationFormatted": "3:10",
+          "isExplicit": false
+        }
+      ]
+    },
     {
       "id": "single-7b9RC8DlgDS0noJB8T59f8",
       "type": "single",
@@ -22,13 +76,13 @@
         {
           "trackNumber": 1,
           "title": "Picking My Bones",
-          "spotifyId": "7b9RC8DlgDS0noJB8T59f8",
-          "spotifyUrl": "https://open.spotify.com/album/7b9RC8DlgDS0noJB8T59f8",
+          "spotifyId": "0sZHbk5PM780yZq4MM0Zru",
+          "spotifyUrl": "https://open.spotify.com/track/0sZHbk5PM780yZq4MM0Zru",
           "appleMusicUrl": null,
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 0,
-          "durationFormatted": "—",
+          "durationMs": 192000,
+          "durationFormatted": "3:12",
           "isExplicit": false
         }
       ]
@@ -52,13 +106,13 @@
         {
           "trackNumber": 1,
           "title": "Coordination Problem",
-          "spotifyId": "0g3pi3EnUcXe5PA9iGnH9G",
-          "spotifyUrl": "https://open.spotify.com/album/0g3pi3EnUcXe5PA9iGnH9G",
+          "spotifyId": "0c4RMeMvrz0iMky7E8XcrU",
+          "spotifyUrl": "https://open.spotify.com/track/0c4RMeMvrz0iMky7E8XcrU",
           "appleMusicUrl": null,
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 0,
-          "durationFormatted": "—",
+          "durationMs": 190000,
+          "durationFormatted": "3:10",
           "isExplicit": false
         }
       ]
@@ -82,13 +136,13 @@
         {
           "trackNumber": 1,
           "title": "Barbarians in the Gates",
-          "spotifyId": "7pr018sOJXFQRl5gmhvsz6",
-          "spotifyUrl": "https://open.spotify.com/album/7pr018sOJXFQRl5gmhvsz6",
+          "spotifyId": "0nF75fhwrmlMgcjGHx199a",
+          "spotifyUrl": "https://open.spotify.com/track/0nF75fhwrmlMgcjGHx199a",
           "appleMusicUrl": null,
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 0,
-          "durationFormatted": "—",
+          "durationMs": 216000,
+          "durationFormatted": "3:36",
           "isExplicit": false
         }
       ]
@@ -112,13 +166,13 @@
         {
           "trackNumber": 1,
           "title": "It's a trap",
-          "spotifyId": "69trRG2l6PmVHwloYvJRCx",
-          "spotifyUrl": "https://open.spotify.com/album/69trRG2l6PmVHwloYvJRCx",
+          "spotifyId": "7yqUt5zWLzC4UCG7HQgL50",
+          "spotifyUrl": "https://open.spotify.com/track/7yqUt5zWLzC4UCG7HQgL50",
           "appleMusicUrl": null,
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 0,
-          "durationFormatted": "—",
+          "durationMs": 197000,
+          "durationFormatted": "3:17",
           "isExplicit": false
         }
       ]
@@ -142,8 +196,8 @@
         {
           "trackNumber": 1,
           "title": "Obey Early",
-          "spotifyId": "3sB9xu6Tbq5ZuyLzbtZjQB",
-          "spotifyUrl": "https://open.spotify.com/album/3sB9xu6Tbq5ZuyLzbtZjQB",
+          "spotifyId": "0Gv9v8Sy90zYYyung39vyQ",
+          "spotifyUrl": "https://open.spotify.com/track/0Gv9v8Sy90zYYyung39vyQ",
           "appleMusicUrl": null,
           "amazonMusicUrl": null,
           "youtubeUrl": null,
@@ -172,13 +226,13 @@
         {
           "trackNumber": 1,
           "title": "Eh Ville",
-          "spotifyId": "2dACkxqxyj4ZUFYGPM3XDa",
-          "spotifyUrl": "https://open.spotify.com/album/2dACkxqxyj4ZUFYGPM3XDa",
+          "spotifyId": "6ANJs2aXHz5k1lbn8SoCdG",
+          "spotifyUrl": "https://open.spotify.com/track/6ANJs2aXHz5k1lbn8SoCdG",
           "appleMusicUrl": null,
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 0,
-          "durationFormatted": "—",
+          "durationMs": 93000,
+          "durationFormatted": "1:33",
           "isExplicit": false
         }
       ]
@@ -202,13 +256,13 @@
         {
           "trackNumber": 1,
           "title": "Stinger",
-          "spotifyId": "4o2iCJcIaBHsOn5uqHDS4c",
-          "spotifyUrl": "https://open.spotify.com/album/4o2iCJcIaBHsOn5uqHDS4c",
+          "spotifyId": "15J0CApYgqv78HgmwE2Rog",
+          "spotifyUrl": "https://open.spotify.com/track/15J0CApYgqv78HgmwE2Rog",
           "appleMusicUrl": null,
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 0,
-          "durationFormatted": "—",
+          "durationMs": 194000,
+          "durationFormatted": "3:14",
           "isExplicit": false
         }
       ]
@@ -232,13 +286,13 @@
         {
           "trackNumber": 1,
           "title": "Didn't you want something?",
-          "spotifyId": "3vEU0S9UYRrS8YJAZOToMG",
-          "spotifyUrl": "https://open.spotify.com/album/3vEU0S9UYRrS8YJAZOToMG",
+          "spotifyId": "6NFcljwNsanoq78mF0rKIA",
+          "spotifyUrl": "https://open.spotify.com/track/6NFcljwNsanoq78mF0rKIA",
           "appleMusicUrl": null,
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 0,
-          "durationFormatted": "—",
+          "durationMs": 92000,
+          "durationFormatted": "1:32",
           "isExplicit": false
         }
       ]
