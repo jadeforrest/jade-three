@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://jadethree.netlify.app',
+  site: 'https://jadethreemusic.com',
   vite: {
     plugins: [tailwindcss()],
   },
