@@ -35,20 +35,19 @@ Goal: Every release shows correct artwork, a working Spotify embed, and real tra
 
 Once live on Spotify:
 
-- [ ] Manually populate `appleMusicUrl` for all releases in `releases.json`
-- [ ] Manually populate `amazonMusicUrl` for all releases
-- [ ] Manually populate `youtubeUrl` / `youtubePlaylistUrl` for all releases
-- [ ] Populate per-track platform URLs where relevant
+- [x] Manually populate `appleMusicUrl` for all releases in `releases.json`
+- [x] Manually populate `amazonMusicUrl` for all releases
+- [x] Manually populate `youtubeUrl` / `youtubePlaylistUrl` for all releases
+- [x] Populate per-track platform URLs where relevant
 
 ---
 
 ## Phase 4 — Full artist homepage
 
+- [ ] **Mailing list / email signup** — fan email capture (e.g. Mailchimp, Google Groups)
 - [ ] **About / bio section** — artist story on the homepage
 - [ ] **Contact / booking** — simple contact form or email link
 - [ ] **Press / media kit** — downloadable press kit, press quotes
-- [ ] **Mailing list / email signup** — fan email capture (e.g. Mailchimp)
-- [ ] **Videos section** — embedded music videos (YouTube)
 - [ ] **SEO improvements** — sitemap, structured data, per-release meta descriptions
 
 ---
