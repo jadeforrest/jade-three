@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "fetch-releases": "node scripts/fetch-releases.js"
+    "fetch-releases": "node scripts/fetch-releases.js",
+    "fetch-apple-music": "node scripts/fetch-apple-music.js"
   },
   "dependencies": {
     "astro": "^5.3.0"
