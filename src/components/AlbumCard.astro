@@ -32,7 +32,7 @@ const formattedDate = releaseDate.toLocaleDateString('en-US', {
       spotifyUrl={release.spotifyUrl}
       appleMusicUrl={release.appleMusicUrl}
       amazonMusicUrl={release.amazonMusicUrl}
-      youtubeUrl={release.youtubeUrl ?? release.youtubePlaylistUrl}
+      youtubeUrl={release.youtubePlaylistUrl ?? release.youtubeUrl}
       size={18}
       class="pt-1 shrink-0"
     />
