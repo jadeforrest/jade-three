@@ -15,5 +15,11 @@ const { class: className = '', size = 20 } = Astro.props;
   class={className}
   aria-label="Apple Music"
 >
-  <path d="M12.005.24C5.45.24.24 5.45.24 12.005S5.45 23.77 12.005 23.77 23.77 18.56 23.77 12.005 18.56.24 12.005.24zm3.057 5.1l-5.76 1.648v6.18a2.67 2.67 0 00-1.44-.42 2.682 2.682 0 100 5.364 2.682 2.682 0 002.682-2.682V9.072l4.518-1.29v4.55a2.67 2.67 0 00-1.44-.42 2.682 2.682 0 100 5.364 2.682 2.682 0 002.682-2.682V5.916a.552.552 0 00-.242-.576z"/>
+  <!-- Rounded square border -->
+  <rect x="1" y="1" width="22" height="22" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.35"/>
+  <!-- Note heads -->
+  <circle cx="6.5" cy="17" r="2.5"/>
+  <circle cx="17" cy="13" r="2.5"/>
+  <!-- Stems and beam -->
+  <path d="M9 17V7l10.5-2v8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
