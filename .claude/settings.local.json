@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "WebFetch(domain:developer.spotify.com)",
+      "WebFetch(domain:docs.astro.build)",
+      "WebFetch(domain:open.spotify.com)",
+      "Bash(~/.nvm/versions/node/v20.18.2/bin/node:*)",
+      "WebSearch",
+      "Bash(npm run:*)",
+      "Bash(npx playwright:*)",
+      "Bash(cat:*)"
+    ]
+  }
+}
