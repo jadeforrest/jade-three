@@ -5,9 +5,10 @@ import type { Release } from '../types/releases';
 
 interface Props {
   releases: Release[];
+  slugMap: Record<string, string>;
 }
 
-const { releases } = Astro.props;
+const { releases, slugMap } = Astro.props;
 
 // Sort all releases newest-first
 const sorted = [...releases].sort(
@@ -36,11 +37,11 @@ for (const release of sorted) {
 <div class="space-y-8">
   {groups.map(group => (
     group.kind === 'multi' ? (
-      <AlbumCard release={group.release} />
+      <AlbumCard release={group.release} slug={slugMap[group.release.id]} />
     ) : (
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {group.releases.map(release => (
-          <SingleCard release={release} />
+          <SingleCard release={release} slug={slugMap[release.id]} />
         ))}
       </div>
     )

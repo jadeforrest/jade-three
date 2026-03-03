@@ -1,0 +1,139 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import SpotifyEmbed from '../../components/SpotifyEmbed.astro';
+import PlatformLinks from '../../components/PlatformLinks.astro';
+import releasesData from '../../data/releases.json';
+import type { ReleasesData } from '../../types/releases';
+
+export async function getStaticPaths() {
+  const songs = await getCollection('songs');
+  return songs.map((song) => ({
+    params: { slug: song.slug },
+    props: { song },
+  }));
+}
+
+const { song } = Astro.props;
+const { Content } = await render(song);
+
+const data = releasesData as ReleasesData;
+const release = data.releases.find((r) => r.id === song.data.releaseId);
+
+if (!release) throw new Error(`No release found for releaseId: ${song.data.releaseId}`);
+
+const releaseDate = new Date(release.releaseDate + 'T12:00:00');
+const formattedDate = releaseDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const typeLabel = release.type === 'ep' ? 'EP' : release.type === 'album' ? 'Album' : 'Single';
+const embedId = release.type === 'single'
+  ? (release.tracks[0]?.spotifyId ?? release.spotifyId)
+  : release.spotifyId;
+const embedType = release.type === 'single' ? 'track' : 'album';
+const embedHeight = release.type === 'single' ? 152 : 352;
+---
+<BaseLayout
+  title={`${release.title} — Jade Three`}
+  description={`${typeLabel} by Jade Three, released ${formattedDate}.`}
+>
+  <Header />
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <!-- Blurred artwork backdrop -->
+    <div
+      class="absolute inset-0 bg-cover bg-center scale-110 blur-3xl opacity-20"
+      style={`background-image: url('${release.artworkUrl}')`}
+      aria-hidden="true"
+    ></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-base/50 via-base/70 to-base" aria-hidden="true"></div>
+
+    <div class="relative max-w-4xl mx-auto px-6 pt-12 pb-16 flex flex-col sm:flex-row gap-8 items-end">
+      <!-- Artwork -->
+      <img
+        src={release.artworkUrl}
+        alt={`${release.title} artwork`}
+        width="192"
+        height="192"
+        class="rounded-xl shadow-2xl shrink-0 w-36 sm:w-48"
+      />
+
+      <!-- Meta -->
+      <div class="flex flex-col gap-3 pb-1">
+        <p class="text-xs font-semibold uppercase tracking-widest text-accent">{typeLabel} · {formattedDate}</p>
+        <h1 class="font-display text-3xl sm:text-5xl font-semibold text-text-primary leading-tight">
+          {release.title}
+        </h1>
+        <PlatformLinks
+          spotifyUrl={release.spotifyUrl}
+          appleMusicUrl={release.appleMusicUrl}
+          amazonMusicUrl={release.amazonMusicUrl}
+          youtubeUrl={release.youtubePlaylistUrl ?? release.youtubeUrl}
+          size={22}
+          class="mt-1"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="max-w-4xl mx-auto px-6 pb-24">
+    <!-- Back link -->
+    <a
+      href="/"
+      class="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text-primary transition-colors duration-200 mb-8 block"
+    >
+      ← All releases
+    </a>
+
+    <!-- Embed -->
+    <div class="mb-14">
+      <SpotifyEmbed spotifyId={embedId} type={embedType} height={embedHeight} />
+    </div>
+
+    <!-- Song notes -->
+    <div class="prose-song">
+      <Content />
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Hide the top-level Q&A heading — the page context makes it redundant */
+  .prose-song :global(h1) {
+    display: none;
+  }
+
+  /* Questions become small gold labels */
+  .prose-song :global(h2) {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+    margin-top: 2.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  /* First h2 shouldn't have extra top margin */
+  .prose-song :global(h2:first-of-type) {
+    margin-top: 0;
+  }
+
+  /* Answer text */
+  .prose-song :global(p) {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text-body);
+    margin: 0;
+  }
+</style>

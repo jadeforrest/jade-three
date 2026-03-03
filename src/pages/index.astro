@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -8,6 +9,8 @@ import releasesData from '../data/releases.json';
 import type { ReleasesData } from '../types/releases';
 
 const data = releasesData as ReleasesData;
+const songs = await getCollection('songs');
+const slugMap = Object.fromEntries(songs.map((s) => [s.data.releaseId, s.slug]));
 ---
 <BaseLayout
   title="Jade Three — Music"
@@ -19,7 +22,7 @@ const data = releasesData as ReleasesData;
     <HeroSection artistName={data.artistName} />
 
     <section id="releases" class="max-w-5xl mx-auto px-6 py-16">
-      <ReleasesGrid releases={data.releases} />
+      <ReleasesGrid releases={data.releases} slugMap={slugMap} />
     </section>
   </main>
 

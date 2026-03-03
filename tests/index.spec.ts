@@ -39,14 +39,14 @@ test.describe('Jade Three homepage', () => {
     expect(await cards.count()).toBeGreaterThanOrEqual(1);
   });
 
-  test('multi-track releases display a full tracklist', async ({ page }) => {
+  test('EP/album releases render with title and Spotify embed', async ({ page }) => {
     await page.goto('/');
-    // AlbumCard renders "N tracks" in its subtitle for multi-track releases
-    const multiTrackCard = page.locator('#releases article').filter({ hasText: /\d+ tracks/ });
-    await expect(multiTrackCard.first()).toBeVisible();
-    // Each track row has a Spotify track link — check at least 2 are present
-    const trackLinks = multiTrackCard.first().locator('a[href*="open.spotify.com/track"]');
-    expect(await trackLinks.count()).toBeGreaterThanOrEqual(2);
+    // AlbumCard renders the release title and an "EP" or "Album" label
+    const albumCard = page.locator('#releases article').filter({ hasText: /\bEP\b|\bAlbum\b/ });
+    await expect(albumCard.first()).toBeVisible();
+    // The card includes a Spotify album embed
+    const embed = albumCard.first().locator('iframe[src*="open.spotify.com/embed/album"]');
+    await expect(embed).toBeVisible();
   });
 
   test('each release card has a Spotify link', async ({ page }) => {
