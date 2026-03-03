@@ -38,6 +38,7 @@ async function generateClips(content, url) {
 Requirements:
 - Clip text must be ≤${maxTextLen} characters (the full post appends a blank line + the URL, which must stay under 300 chars total)
 - Mix first-person clips (using Jade Three's own voice from the interview) and third-person clips
+- Jade Three's pronouns are he/him — use them in third-person clips
 - Light editing is fine — keep the authentic voice, just sharpen for social media
 - Separate each clip with "---" on its own line
 - Return ONLY the clips, nothing else
