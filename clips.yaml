@@ -425,7 +425,7 @@
   url: https://jadethreemusic.com/releases/eh-ville
   clips:
     - approved: true
-      sent: false
+      sent: true
       text: |
         Jade Three's "Eh Ville" is instrumental — clear, direct, and focused. "Something to aspire to in a lot of my other music."
 
@@ -1099,7 +1099,7 @@
         https://jadethreemusic.com/releases/year-until-the-fall
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         It was kind of hard to make music for a couple of months after this one. Everything else just didn't seem as good.
 
