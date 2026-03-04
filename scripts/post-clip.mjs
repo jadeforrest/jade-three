@@ -1,0 +1,167 @@
+#!/usr/bin/env node
+/**
+ * Posts a random approved, unsent clip from clips.yaml to Bluesky.
+ *
+ * Usage:
+ *   node scripts/post-clip.mjs            # post for real
+ *   node scripts/post-clip.mjs --dry-run  # preview without posting
+ *
+ * Required env vars:
+ *   BLUESKY_HANDLE        your handle, e.g. jadethree.bsky.social
+ *   BLUESKY_APP_PASSWORD  app password from Settings → Privacy → App Passwords
+ */
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import yaml from 'js-yaml';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.join(__dirname, '..');
+const CLIPS_FILE = path.join(ROOT, 'clips.yaml');
+const BSKY_API = 'https://bsky.social/xrpc';
+
+const DRY_RUN = process.argv.includes('--dry-run') || process.argv.includes('-n');
+
+// ── Clip loading ──────────────────────────────────────────────────────────────
+
+function loadEligibleClips() {
+  const raw = fs.readFileSync(CLIPS_FILE, 'utf-8');
+  const songs = yaml.load(raw);
+
+  const eligible = [];
+  for (const song of songs) {
+    for (const clip of song.clips ?? []) {
+      if (clip.approved === true && clip.sent === false) {
+        eligible.push({ slug: song.slug, text: clip.text.trim() });
+      }
+    }
+  }
+  return eligible;
+}
+
+// ── File update ───────────────────────────────────────────────────────────────
+
+function markSent(clipText) {
+  const content = fs.readFileSync(CLIPS_FILE, 'utf-8');
+
+  // Find the clip by its first line (indented 8 spaces in the file)
+  const firstLine = clipText.split('\n')[0];
+  const idx = content.indexOf(`        ${firstLine}`);
+  if (idx === -1) throw new Error(`Could not locate clip in file:\n  ${firstLine}`);
+
+  // Walk back to find the nearest "sent: false" before this position
+  const marker = '      sent: false';
+  const markerIdx = content.lastIndexOf(marker, idx);
+  if (markerIdx === -1) throw new Error('Could not find sent: false for this clip');
+
+  const updated =
+    content.slice(0, markerIdx) +
+    '      sent: true' +
+    content.slice(markerIdx + marker.length);
+
+  fs.writeFileSync(CLIPS_FILE, updated);
+}
+
+// ── Bluesky ───────────────────────────────────────────────────────────────────
+
+async function bskyPost(handle, password, text) {
+  // 1. Authenticate
+  const authRes = await fetch(`${BSKY_API}/com.atproto.server.createSession`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ identifier: handle, password }),
+  });
+  if (!authRes.ok) {
+    const err = await authRes.text();
+    throw new Error(`Bluesky auth failed: ${err}`);
+  }
+  const { did, accessJwt } = await authRes.json();
+
+  // 2. Detect URL facets (so links are clickable on Bluesky)
+  const facets = detectUrlFacets(text);
+
+  // 3. Create the post
+  const postRes = await fetch(`${BSKY_API}/com.atproto.repo.createRecord`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessJwt}`,
+    },
+    body: JSON.stringify({
+      repo: did,
+      collection: 'app.bsky.feed.post',
+      record: {
+        $type: 'app.bsky.feed.post',
+        text,
+        ...(facets.length > 0 && { facets }),
+        createdAt: new Date().toISOString(),
+      },
+    }),
+  });
+  if (!postRes.ok) {
+    const err = await postRes.text();
+    throw new Error(`Bluesky post failed: ${err}`);
+  }
+  return postRes.json();
+}
+
+// Bluesky facets use UTF-8 byte offsets
+function detectUrlFacets(text) {
+  const enc = new TextEncoder();
+  const urlRe = /https?:\/\/[^\s]+/g;
+  const facets = [];
+  let match;
+  while ((match = urlRe.exec(text)) !== null) {
+    const byteStart = enc.encode(text.slice(0, match.index)).length;
+    const byteEnd = byteStart + enc.encode(match[0]).length;
+    facets.push({
+      index: { byteStart, byteEnd },
+      features: [{ $type: 'app.bsky.richtext.facet#link', uri: match[0] }],
+    });
+  }
+  return facets;
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+
+async function main() {
+  const eligible = loadEligibleClips();
+
+  if (eligible.length === 0) {
+    console.log('No approved, unsent clips available.');
+    process.exit(0);
+  }
+
+  const clip = eligible[Math.floor(Math.random() * eligible.length)];
+
+  console.log(`Song:   ${clip.slug}`);
+  console.log(`Length: ${clip.text.length} chars`);
+  console.log('─'.repeat(50));
+  console.log(clip.text);
+  console.log('─'.repeat(50));
+
+  if (DRY_RUN) {
+    console.log('\n[Dry run] Not posting. Exiting.');
+    return;
+  }
+
+  const handle = process.env.BLUESKY_HANDLE;
+  const password = process.env.BLUESKY_APP_PASSWORD;
+
+  if (!handle || !password) {
+    console.error('Error: BLUESKY_HANDLE and BLUESKY_APP_PASSWORD must be set.');
+    process.exit(1);
+  }
+
+  const result = await bskyPost(handle, password, clip.text);
+  console.log(`\nPosted! ${result.uri}`);
+
+  markSent(clip.text);
+  console.log('clips.yaml updated: marked as sent.');
+}
+
+main().catch(err => {
+  console.error(err.message);
+  process.exit(1);
+});
