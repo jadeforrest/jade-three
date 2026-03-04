@@ -41,6 +41,8 @@ const embedHeight = release.type === 'single' ? 152 : 352;
 <BaseLayout
   title={`${release.title} — Jade Three`}
   description={`${typeLabel} by Jade Three, released ${formattedDate}.`}
+  ogImage={release.artworkUrl}
+  canonicalUrl={Astro.url.href}
 >
   <Header />
 
