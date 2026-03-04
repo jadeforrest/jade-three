@@ -65,6 +65,39 @@ function markSent(clipText) {
 
 // ── Bluesky ───────────────────────────────────────────────────────────────────
 
+// Fetch OG title/description/image from a URL
+async function fetchOgData(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': 'Bluesky/cardyb' } });
+  const html = await res.text();
+  const get = (prop) =>
+    html.match(new RegExp(`<meta[^>]+property="${prop}"[^>]+content="([^"]+)"`))?.[1] ??
+    html.match(new RegExp(`<meta[^>]+content="([^"]+)"[^>]+property="${prop}"`))?.[1];
+  return {
+    title: get('og:title') ?? url,
+    description: get('og:description') ?? '',
+    imageUrl: get('og:image'),
+  };
+}
+
+// Download an image and upload it as a Bluesky blob
+async function uploadThumb(imageUrl, accessJwt) {
+  try {
+    const res = await fetch(imageUrl);
+    if (!res.ok) return null;
+    const mimeType = res.headers.get('content-type') ?? 'image/jpeg';
+    const body = await res.arrayBuffer();
+    const uploadRes = await fetch(`${BSKY_API}/com.atproto.repo.uploadBlob`, {
+      method: 'POST',
+      headers: { 'Content-Type': mimeType, Authorization: `Bearer ${accessJwt}` },
+      body,
+    });
+    if (!uploadRes.ok) return null;
+    return (await uploadRes.json()).blob;
+  } catch {
+    return null;
+  }
+}
+
 async function bskyPost(handle, password, text) {
   // 1. Authenticate
   const authRes = await fetch(`${BSKY_API}/com.atproto.server.createSession`, {
@@ -78,10 +111,27 @@ async function bskyPost(handle, password, text) {
   }
   const { did, accessJwt } = await authRes.json();
 
-  // 2. Detect URL facets (so links are clickable on Bluesky)
+  // 2. Detect URL facets (so the link in the post text is clickable)
   const facets = detectUrlFacets(text);
 
-  // 3. Create the post
+  // 3. Build link card embed from the release page's OG tags
+  const postUrl = text.split('\n').filter(Boolean).at(-1).trim();
+  process.stderr.write(`Fetching OG data for: ${postUrl}\n`);
+  const og = await fetchOgData(postUrl);
+  const thumb = og.imageUrl ? await uploadThumb(og.imageUrl, accessJwt) : null;
+  if (!thumb) process.stderr.write('  (no thumbnail — image unavailable)\n');
+
+  const embed = {
+    $type: 'app.bsky.embed.external',
+    external: {
+      uri: postUrl,
+      title: og.title,
+      description: og.description,
+      ...(thumb && { thumb }),
+    },
+  };
+
+  // 4. Create the post
   const postRes = await fetch(`${BSKY_API}/com.atproto.repo.createRecord`, {
     method: 'POST',
     headers: {
@@ -95,6 +145,7 @@ async function bskyPost(handle, password, text) {
         $type: 'app.bsky.feed.post',
         text,
         ...(facets.length > 0 && { facets }),
+        embed,
         createdAt: new Date().toISOString(),
       },
     }),
