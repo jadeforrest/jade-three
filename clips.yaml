@@ -54,7 +54,7 @@
         https://jadethreemusic.com/releases/stinger
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         "It took a lot of work, and there are still weaknesses in it — but even today I'm pretty happy with how it turned out." Respect the honesty.
 
@@ -103,7 +103,7 @@
         https://jadethreemusic.com/releases/stinger
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         Mood first. Sounds second. Everything else figured out along the way. Jade Three — "Stinger."
 
@@ -681,7 +681,7 @@
   url: https://jadethreemusic.com/releases/its-a-trap
   clips:
     - approved: true
-      sent: false
+      sent: true
       text: |
         Melancholy but hopeful — that's the mood of "It's a Trap." Mostly instrumental, some sampled vocal clips, and a sound that sits somewhere between sparse and layered. Out now.
 
