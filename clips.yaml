@@ -284,7 +284,7 @@
         https://jadethreemusic.com/releases/coordination-problem
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         No lyrics. No anxiety. Just a calm, pretty soundscape with a dystopian name. Jade Three's "Coordination Problem" is something else.
 
@@ -455,7 +455,7 @@
         https://jadethreemusic.com/releases/eh-ville
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         The name "Eh Ville" came from a vacation in Canada. Jade Three's words: "A bit of a dumb reason to name it that, but there it is."
 
@@ -476,7 +476,7 @@
         https://jadethreemusic.com/releases/eh-ville
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         "It's very direct — it hits you on the head with everything." Sometimes that's exactly what a track needs to be.
 
@@ -514,7 +514,7 @@
   url: https://jadethreemusic.com/releases/fight-or-flight
   clips:
     - approved: true
-      sent: false
+      sent: true
       text: |
         Fight or Flight started as a chord progression I just loved. It had this jazzy feel, then I added a slight electronic twist — and somehow it all clicked.
 
@@ -657,7 +657,7 @@
         https://jadethreemusic.com/releases/fractional-person
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         When your day job inspires a track title — fractional leadership → fractional person. Evocative. Weird. Perfect.
 
@@ -737,7 +737,7 @@
         https://jadethreemusic.com/releases/its-a-trap
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         I was pretty happy with how all the sounds layered — yet the song stays spare and clean. That balance was the whole goal.
 
@@ -765,7 +765,7 @@
         https://jadethreemusic.com/releases/its-a-trap
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         "It's a Trap" layers a plucked rhythm, reversed harp swells, and sampled vocal clips into something that feels both full and completely stripped back.
 
@@ -838,14 +838,14 @@
         https://jadethreemusic.com/releases/obey-early
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         There were droning sounds that somehow managed to sound pretty. That surprised me — and I'm really happy with how it all turned out.
 
         https://jadethreemusic.com/releases/obey-early
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         Jade Three on "Obey Early": pretty, delicate, and built around the tension between a title and the music it names.
 
@@ -939,7 +939,7 @@
         https://jadethreemusic.com/releases/picking-my-bones
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         Somber. Building. A grinding bass. A peak that hits hard. Then a quiet release. "Picking My Bones" takes you somewhere and brings you back down gently.
 

@@ -22,6 +22,7 @@ const CLIPS_FILE = path.join(ROOT, 'clips.yaml');
 const BSKY_API = 'https://bsky.social/xrpc';
 
 const DRY_RUN = process.argv.includes('--dry-run') || process.argv.includes('-n');
+const BSKY_HEADERS = { 'User-Agent': 'jade-three-bot/1.0' };
 
 // ── Clip loading ──────────────────────────────────────────────────────────────
 
@@ -80,15 +81,15 @@ async function fetchOgData(url) {
 }
 
 // Download an image and upload it as a Bluesky blob
-async function uploadThumb(imageUrl, accessJwt) {
+async function uploadThumb(imageUrl, accessJwt, pdsApi) {
   try {
     const res = await fetch(imageUrl);
     if (!res.ok) return null;
     const mimeType = res.headers.get('content-type') ?? 'image/jpeg';
     const body = await res.arrayBuffer();
-    const uploadRes = await fetch(`${BSKY_API}/com.atproto.repo.uploadBlob`, {
+    const uploadRes = await fetch(`${pdsApi}/com.atproto.repo.uploadBlob`, {
       method: 'POST',
-      headers: { 'Content-Type': mimeType, Authorization: `Bearer ${accessJwt}` },
+      headers: { 'Content-Type': mimeType, Authorization: `Bearer ${accessJwt}`, ...BSKY_HEADERS },
       body,
     });
     if (!uploadRes.ok) return null;
@@ -102,14 +103,20 @@ async function bskyPost(handle, password, text) {
   // 1. Authenticate
   const authRes = await fetch(`${BSKY_API}/com.atproto.server.createSession`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...BSKY_HEADERS },
     body: JSON.stringify({ identifier: handle, password }),
   });
   if (!authRes.ok) {
     const err = await authRes.text();
     throw new Error(`Bluesky auth failed: ${err}`);
   }
-  const { did, accessJwt } = await authRes.json();
+  const { did, accessJwt, didDoc } = await authRes.json();
+
+  // Resolve the PDS URL from the DID document (accounts may be on a different PDS than bsky.social)
+  const pdsUrl =
+    didDoc?.service?.find(s => s.id === '#atproto_pds')?.serviceEndpoint ?? 'https://bsky.social';
+  const pdsApi = `${pdsUrl}/xrpc`;
+  process.stderr.write(`PDS: ${pdsUrl}\n`);
 
   // 2. Detect URL facets (so the link in the post text is clickable)
   const facets = detectUrlFacets(text);
@@ -118,7 +125,7 @@ async function bskyPost(handle, password, text) {
   const postUrl = text.split('\n').filter(Boolean).at(-1).trim();
   process.stderr.write(`Fetching OG data for: ${postUrl}\n`);
   const og = await fetchOgData(postUrl);
-  const thumb = og.imageUrl ? await uploadThumb(og.imageUrl, accessJwt) : null;
+  const thumb = og.imageUrl ? await uploadThumb(og.imageUrl, accessJwt, pdsApi) : null;
   if (!thumb) process.stderr.write('  (no thumbnail — image unavailable)\n');
 
   const embed = {
@@ -132,11 +139,12 @@ async function bskyPost(handle, password, text) {
   };
 
   // 4. Create the post
-  const postRes = await fetch(`${BSKY_API}/com.atproto.repo.createRecord`, {
+  const postRes = await fetch(`${pdsApi}/com.atproto.repo.createRecord`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${accessJwt}`,
+      ...BSKY_HEADERS,
     },
     body: JSON.stringify({
       repo: did,
