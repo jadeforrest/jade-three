@@ -401,7 +401,7 @@
         https://jadethreemusic.com/releases/didnt-you-want-something
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         "I can hear things I'd do differently now." Jade Three on revisiting early work — honest, unfiltered, and still proud of where it started.
 
@@ -953,7 +953,7 @@
         https://jadethreemusic.com/releases/picking-my-bones
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         Jade Three calls "Picking My Bones" a real turning point — the track where learning to arrange music shifted everything about how the songs sound and feel.
 
