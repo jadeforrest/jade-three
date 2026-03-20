@@ -40,3 +40,51 @@ After syncing, manually add `amazonMusicUrl` for any new entries, then commit th
 ```bash
 npx playwright test
 ```
+
+## Posting clips to Bluesky
+
+`scripts/post-clip.mjs` picks a random approved, unsent clip from `clips.yaml` and posts it to Bluesky with a link card.
+
+### 1. Get a Bluesky app password
+
+1. Log into Bluesky
+2. Go to **Settings → Privacy and Security → App Passwords**
+3. Create a new app password and copy it
+
+### 2. Set environment variables
+
+```sh
+export BLUESKY_HANDLE=yourhandle.bsky.social
+export BLUESKY_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+```
+
+### 3. Mark clips for posting in `clips.yaml`
+
+Each clip has two flags:
+
+```yaml
+- approved: false   # set to true to make eligible for posting
+  sent: false       # updated automatically after posting — don't change by hand
+  text: |
+    Your post text here.
+
+    https://jadethreemusic.com/releases/your-song
+```
+
+Set `approved: true` on any clips you want to post. Leave `sent` alone — the script flips it to `true` automatically after a successful post.
+
+### 4. Preview before posting (dry run)
+
+```sh
+node scripts/post-clip.mjs --dry-run
+```
+
+Prints the clip that would be posted without sending anything.
+
+### 5. Post for real
+
+```sh
+node scripts/post-clip.mjs
+```
+
+Picks one eligible clip at random, posts it to Bluesky with a link card, then marks it `sent: true` in `clips.yaml`. Commit the updated `clips.yaml` afterward to keep the record in sync.
