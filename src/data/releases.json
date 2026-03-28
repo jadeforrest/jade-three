@@ -1,8 +1,37 @@
 {
-  "lastUpdated": "2026-02-28",
+  "lastUpdated": "2026-03-28",
   "artistName": "Jade Three",
-  "spotifyArtistId": "2T04y62jXdLsznulD3sT4D",
   "releases": [
+    {
+      "id": "single-1888734107",
+      "type": "single",
+      "title": "Fall in Love",
+      "releaseDate": "2026-02-22",
+      "year": 2026,
+      "spotifyId": null,
+      "spotifyUrl": null,
+      "appleMusicUrl": "https://music.apple.com/us/album/fall-in-love-single/1888734107?uo=4",
+      "amazonMusicUrl": null,
+      "youtubePlaylistUrl": null,
+      "youtubeUrl": null,
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/88/cd/ca/88cdca7b-3c56-44a0-616e-22f42aa4a2de/5063941369723_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/88/cd/ca/88cdca7b-3c56-44a0-616e-22f42aa4a2de/5063941369723_cover.jpg/64x64bb.jpg",
+      "totalTracks": 1,
+      "tracks": [
+        {
+          "trackNumber": 1,
+          "title": "Fall in Love",
+          "spotifyId": null,
+          "spotifyUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/fall-in-love/1888734107?i=1888734108&uo=4",
+          "amazonMusicUrl": null,
+          "youtubeUrl": null,
+          "durationMs": 207692,
+          "durationFormatted": "3:28",
+          "isExplicit": false
+        }
+      ]
+    },
     {
       "id": "ep-7qUiYF0NhcV4epRkvR7LWn",
       "type": "ep",
@@ -15,8 +44,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": "https://www.youtube.com/playlist?list=OLAK5uy_mcR_3znqp8C4_1xmuSTAIfDINJe9oqAVU",
       "youtubeUrl": "https://www.youtube.com/watch?v=eOrl4ckHgWY",
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02da779378d03279b52a0c6701",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273da779378d03279b52a0c6701",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/de/11/68/de11688d-e1e4-c11d-b3a5-abc026313716/5063863517233_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/de/11/68/de11688d-e1e4-c11d-b3a5-abc026313716/5063863517233_cover.jpg/64x64bb.jpg",
       "totalTracks": 3,
       "tracks": [
         {
@@ -24,11 +53,11 @@
           "title": "Year until the fall",
           "spotifyId": "6RMA9PlyDKcmbBqsuXbZ3r",
           "spotifyUrl": "https://open.spotify.com/track/6RMA9PlyDKcmbBqsuXbZ3r",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/year-until-the-fall/1856079022?i=1856079023&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 298666,
-          "durationFormatted": "4:58",
+          "durationMs": 298667,
+          "durationFormatted": "4:59",
           "isExplicit": false
         },
         {
@@ -36,11 +65,11 @@
           "title": "Fractional person",
           "spotifyId": "05hOxu35DUjdAdOr6k8WXq",
           "spotifyUrl": "https://open.spotify.com/track/05hOxu35DUjdAdOr6k8WXq",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/fractional-person/1856079022?i=1856079206&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
           "durationMs": 285818,
-          "durationFormatted": "4:45",
+          "durationFormatted": "4:46",
           "isExplicit": false
         },
         {
@@ -48,7 +77,7 @@
           "title": "Fight or flight",
           "spotifyId": "7DVIgPMpkPzHS8jbMpt2Jz",
           "spotifyUrl": "https://open.spotify.com/track/7DVIgPMpkPzHS8jbMpt2Jz",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/fight-or-flight/1856079022?i=1856079207&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
           "durationMs": 190000,
@@ -69,8 +98,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": null,
       "youtubeUrl": null,
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02bba5244a069633bc3c9b365a",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273bba5244a069633bc3c9b365a",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/98/e8/d0/98e8d089-0ab6-84a6-e9a4-f1dadcb2b358/5063812991268_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/98/e8/d0/98e8d089-0ab6-84a6-e9a4-f1dadcb2b358/5063812991268_cover.jpg/64x64bb.jpg",
       "totalTracks": 1,
       "tracks": [
         {
@@ -78,7 +107,7 @@
           "title": "Picking My Bones",
           "spotifyId": "0sZHbk5PM780yZq4MM0Zru",
           "spotifyUrl": "https://open.spotify.com/track/0sZHbk5PM780yZq4MM0Zru",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/picking-my-bones/1838455293?i=1838455294&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
           "durationMs": 192000,
@@ -99,8 +128,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": null,
       "youtubeUrl": "https://www.youtube.com/watch?v=i73qm9nU98E",
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02a9dceff42a89c9964a84b2fe",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273a9dceff42a89c9964a84b2fe",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3a/89/a8/3a89a812-5d4e-bd0a-3a8c-e08dfca50668/5063740679061_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3a/89/a8/3a89a812-5d4e-bd0a-3a8c-e08dfca50668/5063740679061_cover.jpg/64x64bb.jpg",
       "totalTracks": 1,
       "tracks": [
         {
@@ -108,10 +137,10 @@
           "title": "Coordination Problem",
           "spotifyId": "0c4RMeMvrz0iMky7E8XcrU",
           "spotifyUrl": "https://open.spotify.com/track/0c4RMeMvrz0iMky7E8XcrU",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/coordination-problem/1809274326?i=1809274327&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 190000,
+          "durationMs": 190209,
           "durationFormatted": "3:10",
           "isExplicit": false
         }
@@ -129,8 +158,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": null,
       "youtubeUrl": "https://www.youtube.com/watch?v=4uHTQ97kEbo",
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02650e92e9e454cf1bb2fffe71",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273650e92e9e454cf1bb2fffe71",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dc/5c/54/dc5c549c-323b-762e-b6d0-f5cd5d8c4374/5063710844949_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dc/5c/54/dc5c549c-323b-762e-b6d0-f5cd5d8c4374/5063710844949_cover.jpg/64x64bb.jpg",
       "totalTracks": 1,
       "tracks": [
         {
@@ -138,11 +167,11 @@
           "title": "Barbarians in the Gates",
           "spotifyId": "0nF75fhwrmlMgcjGHx199a",
           "spotifyUrl": "https://open.spotify.com/track/0nF75fhwrmlMgcjGHx199a",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/barbarians-in-the-gates/1803081234?i=1803081235&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 216000,
-          "durationFormatted": "3:36",
+          "durationMs": 216958,
+          "durationFormatted": "3:37",
           "isExplicit": false
         }
       ]
@@ -159,8 +188,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": null,
       "youtubeUrl": "https://www.youtube.com/watch?v=PhgebSBgjkQ",
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e025a7f8555d7577d43396e3e84",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b2735a7f8555d7577d43396e3e84",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/01/06/df/0106dfb3-f904-a389-6d44-82a860082ef0/5063670388309_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/01/06/df/0106dfb3-f904-a389-6d44-82a860082ef0/5063670388309_cover.jpg/64x64bb.jpg",
       "totalTracks": 1,
       "tracks": [
         {
@@ -168,11 +197,11 @@
           "title": "It's a trap",
           "spotifyId": "7yqUt5zWLzC4UCG7HQgL50",
           "spotifyUrl": "https://open.spotify.com/track/7yqUt5zWLzC4UCG7HQgL50",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/its-a-trap/1798469588?i=1798469589&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 197000,
-          "durationFormatted": "3:17",
+          "durationMs": 197639,
+          "durationFormatted": "3:18",
           "isExplicit": false
         }
       ]
@@ -189,8 +218,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": null,
       "youtubeUrl": "https://www.youtube.com/watch?v=03B7V7k85HI",
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02917bd13760068783fc3b7285",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273917bd13760068783fc3b7285",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7d/de/53/7dde536e-0623-a171-df40-def67249ff62/5063687604126_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7d/de/53/7dde536e-0623-a171-df40-def67249ff62/5063687604126_cover.jpg/64x64bb.jpg",
       "totalTracks": 1,
       "tracks": [
         {
@@ -198,10 +227,10 @@
           "title": "Obey Early",
           "spotifyId": "0Gv9v8Sy90zYYyung39vyQ",
           "spotifyUrl": "https://open.spotify.com/track/0Gv9v8Sy90zYYyung39vyQ",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/obey-early/1797863934?i=1797863939&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 199000,
+          "durationMs": 199080,
           "durationFormatted": "3:19",
           "isExplicit": false
         }
@@ -219,8 +248,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": null,
       "youtubeUrl": "https://www.youtube.com/watch?v=krYoXha8tew",
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02451a98f0ba7e5b538f46db92",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273451a98f0ba7e5b538f46db92",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/78/58/ed/7858ed78-6c8c-03b3-37e2-352cd3c1eecf/5063621431368_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/78/58/ed/7858ed78-6c8c-03b3-37e2-352cd3c1eecf/5063621431368_cover.jpg/64x64bb.jpg",
       "totalTracks": 1,
       "tracks": [
         {
@@ -228,11 +257,11 @@
           "title": "Eh Ville",
           "spotifyId": "6ANJs2aXHz5k1lbn8SoCdG",
           "spotifyUrl": "https://open.spotify.com/track/6ANJs2aXHz5k1lbn8SoCdG",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/eh-ville/1789533187?i=1789533188&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 93000,
-          "durationFormatted": "1:33",
+          "durationMs": 93620,
+          "durationFormatted": "1:34",
           "isExplicit": false
         }
       ]
@@ -249,8 +278,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": null,
       "youtubeUrl": "https://www.youtube.com/watch?v=1ZemZIcvozk",
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02fceaa0c141e582c28f5b068e",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273fceaa0c141e582c28f5b068e",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/32/d1/eb/32d1ebda-2293-05fd-9bef-cead8ca08c27/5063670327018_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/32/d1/eb/32d1ebda-2293-05fd-9bef-cead8ca08c27/5063670327018_cover.jpg/64x64bb.jpg",
       "totalTracks": 1,
       "tracks": [
         {
@@ -258,10 +287,10 @@
           "title": "Stinger",
           "spotifyId": "15J0CApYgqv78HgmwE2Rog",
           "spotifyUrl": "https://open.spotify.com/track/15J0CApYgqv78HgmwE2Rog",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/stinger/1788364985?i=1788364986&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 194000,
+          "durationMs": 194400,
           "durationFormatted": "3:14",
           "isExplicit": false
         }
@@ -279,8 +308,8 @@
       "amazonMusicUrl": null,
       "youtubePlaylistUrl": null,
       "youtubeUrl": "https://www.youtube.com/watch?v=n5ZhCwV-yy4&list=OLAK5uy_kX-wTfC0HccD4QeluROWN-fb7gT5ovp74",
-      "artworkUrl": "https://i.scdn.co/image/ab67616d00001e02bb503300091c30196f829c1d",
-      "artworkUrlSmall": "https://i.scdn.co/image/ab67616d0000b273bb503300091c30196f829c1d",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/21/30/66/2130662f-bbb0-6049-89df-3fa828d2eed2/5063642934770_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/21/30/66/2130662f-bbb0-6049-89df-3fa828d2eed2/5063642934770_cover.jpg/64x64bb.jpg",
       "totalTracks": 1,
       "tracks": [
         {
@@ -288,10 +317,10 @@
           "title": "Didn't you want something?",
           "spotifyId": "6NFcljwNsanoq78mF0rKIA",
           "spotifyUrl": "https://open.spotify.com/track/6NFcljwNsanoq78mF0rKIA",
-          "appleMusicUrl": null,
+          "appleMusicUrl": "https://music.apple.com/us/album/didnt-you-want-something/1784829412?i=1784829415&uo=4",
           "amazonMusicUrl": null,
           "youtubeUrl": null,
-          "durationMs": 92000,
+          "durationMs": 92104,
           "durationFormatted": "1:32",
           "isExplicit": false
         }

@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 /**
  * fetch-releases.js
- * Fetches all releases for Jade Three from the Spotify API and writes
- * them to src/data/releases.json.
+ * Fetches all releases for Jade Three from the iTunes Search API and writes
+ * them to src/data/releases.json, preserving any existing manually-added data
+ * (Spotify URLs, YouTube links, Amazon Music URLs, etc.).
  *
  * Usage:
- *   1. Copy .env.example to .env and fill in your Spotify credentials.
- *   2. npm run fetch-releases
- *   3. Manually add appleMusicUrl, amazonMusicUrl, youtubeUrl to new entries.
- *   4. Commit and push.
+ *   npm run fetch-releases
  *
+ * No credentials required — iTunes Search API is public.
  * Requires Node 18+ (uses built-in fetch).
  */
 
@@ -21,73 +20,48 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const OUTPUT_PATH = join(ROOT, 'src', 'data', 'releases.json');
 
-const ARTIST_ID = '2T04y62jXdLsznulD3sT4D';
-const MARKET = 'US';
+const ARTIST_NAME = 'Jade Three';
+const DELAY_MS = 300;
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // ---------------------------------------------------------------------------
-// Load credentials from .env (no dotenv dependency needed)
+// iTunes API helpers
 // ---------------------------------------------------------------------------
-function loadEnv() {
-  try {
-    const envText = readFileSync(join(ROOT, '.env'), 'utf-8');
-    for (const line of envText.split('\n')) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-      const eqIdx = trimmed.indexOf('=');
-      if (eqIdx === -1) continue;
-      const key = trimmed.slice(0, eqIdx).trim();
-      const value = trimmed.slice(eqIdx + 1).trim();
-      if (!process.env[key]) process.env[key] = value;
-    }
-  } catch {
-    // .env not found — rely on environment variables already set
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Spotify API helpers
-// ---------------------------------------------------------------------------
-async function getAccessToken(clientId, clientSecret) {
-  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-  const res = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${credentials}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'grant_type=client_credentials',
-  });
-  if (!res.ok) throw new Error(`Token request failed: ${res.status} ${res.statusText}`);
-  const json = await res.json();
-  return json.access_token;
-}
-
-async function spotifyGet(token, path) {
-  const url = path.startsWith('https://') ? path : `https://api.spotify.com/v1${path}`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`Spotify API error: ${res.status} ${url}\n${body}`);
-  }
+async function itunesGet(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`iTunes API error: ${res.status} ${url}`);
   return res.json();
 }
 
-/** Fetch all pages of an endpoint that returns a Paging object. */
-async function fetchAllPages(token, initialUrl) {
-  const items = [];
-  let url = initialUrl;
-  while (url) {
-    const data = await spotifyGet(token, url);
-    items.push(...data.items);
-    url = data.next;
-  }
-  return items;
+async function getArtistId() {
+  const query = encodeURIComponent(ARTIST_NAME);
+  const data = await itunesGet(
+    `https://itunes.apple.com/search?term=${query}&media=music&entity=musicArtist&limit=10&country=US`
+  );
+  const artist = data.results?.find(
+    r => r.wrapperType === 'artist' && r.artistName?.toLowerCase() === ARTIST_NAME.toLowerCase()
+  );
+  if (!artist) throw new Error(`Artist "${ARTIST_NAME}" not found on iTunes`);
+  return artist.artistId;
+}
+
+async function getArtistAlbums(artistId) {
+  const data = await itunesGet(
+    `https://itunes.apple.com/lookup?id=${artistId}&entity=album&limit=200&country=US`
+  );
+  return data.results?.filter(r => r.wrapperType === 'collection') ?? [];
+}
+
+async function getAlbumTracks(collectionId) {
+  const data = await itunesGet(
+    `https://itunes.apple.com/lookup?id=${collectionId}&entity=song&country=US`
+  );
+  return data.results?.filter(r => r.wrapperType === 'track') ?? [];
 }
 
 // ---------------------------------------------------------------------------
-// Data formatting helpers
+// Data helpers
 // ---------------------------------------------------------------------------
 function formatDuration(ms) {
   const totalSec = Math.round(ms / 1000);
@@ -96,20 +70,40 @@ function formatDuration(ms) {
   return `${min}:${sec.toString().padStart(2, '0')}`;
 }
 
-function bestArtworkUrl(images, minWidth = 600) {
-  if (!images || images.length === 0) return '';
-  const sorted = [...images].sort((a, b) => (b.width ?? 0) - (a.width ?? 0));
-  return (sorted.find(img => (img.width ?? 0) >= minWidth) ?? sorted[0]).url;
+/** iTunes returns artworkUrl100 — swap in a larger size. */
+function largeArtworkUrl(url) {
+  return url?.replace('100x100bb', '600x600bb') ?? '';
 }
 
-function smallArtworkUrl(images) {
-  if (!images || images.length === 0) return '';
-  const sorted = [...images].sort((a, b) => (a.width ?? 9999) - (b.width ?? 9999));
-  return sorted[0].url;
+function smallArtworkUrl(url) {
+  return url?.replace('100x100bb', '64x64bb') ?? '';
+}
+
+/**
+ * Normalize a title for fuzzy matching: lowercase, strip iTunes suffixes
+ * ("- Single", "- EP"), remove all non-alphanumeric characters.
+ */
+function normalizeTitle(str) {
+  return (str ?? '')
+    .toLowerCase()
+    .replace(/\s*[-–]\s*(single|ep)$/i, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+/** Strip " - Single" / " - EP" suffix that iTunes appends to collection names. */
+function cleanTitle(collectionName) {
+  return collectionName.replace(/\s*[-–]\s*(Single|EP)$/i, '').trim();
+}
+
+function inferType(collectionName, trackCount) {
+  if (/\bEP\b/i.test(collectionName)) return 'ep';
+  if (trackCount === 1) return 'single';
+  if (trackCount <= 6) return 'ep';
+  return 'album';
 }
 
 // ---------------------------------------------------------------------------
-// Load existing releases to preserve manually-added URLs
+// Load existing data to preserve manually-added content
 // ---------------------------------------------------------------------------
 function loadExisting() {
   try {
@@ -119,111 +113,79 @@ function loadExisting() {
   }
 }
 
-function preserveManualUrls(existing, spotifyId) {
-  const found = existing.releases?.find(r => r.spotifyId === spotifyId);
-  if (!found) return { appleMusicUrl: null, amazonMusicUrl: null, youtubePlaylistUrl: null, youtubeUrl: null };
-  return {
-    appleMusicUrl: found.appleMusicUrl ?? null,
-    amazonMusicUrl: found.amazonMusicUrl ?? null,
-    youtubePlaylistUrl: found.youtubePlaylistUrl ?? null,
-    youtubeUrl: found.youtubeUrl ?? null,
-  };
+function findExistingRelease(existing, collectionName) {
+  const norm = normalizeTitle(collectionName);
+  return existing.releases?.find(r => normalizeTitle(r.title) === norm) ?? null;
 }
 
-function preserveTrackManualUrls(existing, spotifyId, trackId) {
-  const release = existing.releases?.find(r => r.spotifyId === spotifyId);
-  const track = release?.tracks?.find(t => t.spotifyId === trackId);
-  if (!track) return { appleMusicUrl: null, amazonMusicUrl: null, youtubeUrl: null };
-  return {
-    appleMusicUrl: track.appleMusicUrl ?? null,
-    amazonMusicUrl: track.amazonMusicUrl ?? null,
-    youtubeUrl: track.youtubeUrl ?? null,
-  };
+function findExistingTrack(existingRelease, trackName) {
+  const norm = normalizeTitle(trackName);
+  return existingRelease?.tracks?.find(t => normalizeTitle(t.title) === norm) ?? null;
 }
 
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 async function main() {
-  loadEnv();
+  console.log(`Looking up artist "${ARTIST_NAME}" on iTunes...`);
+  const artistId = await getArtistId();
+  console.log(`Found artist ID: ${artistId}`);
 
-  const clientId = process.env.SPOTIFY_CLIENT_ID;
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-
-  if (!clientId || !clientSecret) {
-    console.error('Error: SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET must be set in .env');
-    process.exit(1);
-  }
-
-  console.log('Authenticating with Spotify...');
-  const token = await getAccessToken(clientId, clientSecret);
-
-  console.log(`Fetching releases for artist ${ARTIST_ID}...`);
-  let albumObjects;
-  try {
-    albumObjects = await fetchAllPages(
-      token,
-      `/artists/${ARTIST_ID}/albums?include_groups=album,single&market=${MARKET}&limit=50`
-    );
-  } catch (err) {
-    console.error(`\nFailed to fetch artist albums: ${err.message}`);
-    console.error('This is usually a Spotify developer-mode restriction.');
-    console.error('Make sure your Spotify account is added under User Management in the app settings at developer.spotify.com/dashboard');
-    process.exit(1);
-  }
-
-  console.log(`Found ${albumObjects.length} releases. Fetching track data...`);
+  console.log('Fetching releases...');
+  const albums = await getArtistAlbums(artistId);
+  console.log(`Found ${albums.length} releases. Fetching track data...`);
 
   const existing = loadExisting();
   const releases = [];
 
-  for (const album of albumObjects) {
-    process.stdout.write(`  Processing "${album.name}"...`);
+  for (const album of albums) {
+    process.stdout.write(`  Processing "${album.collectionName}"...`);
+    await sleep(DELAY_MS);
 
-    // Images and metadata come from the simplified album object in the list response.
-    // Track data requires an additional endpoint — attempt it but fall back gracefully
-    // if Spotify's development-mode restrictions block the call.
     let trackItems = [];
     try {
-      trackItems = await fetchAllPages(token, `/albums/${album.id}/tracks?limit=50`);
+      trackItems = await getAlbumTracks(album.collectionId);
     } catch (err) {
-      console.warn(`\n    Warning: could not fetch tracks (${err.message.split('\n')[0]}). Continuing without track list.`);
+      console.warn(`\n    Warning: could not fetch tracks (${err.message}). Continuing without track list.`);
     }
 
-    const manual = preserveManualUrls(existing, album.id);
-    const releaseType = album.album_type === 'album' ? 'album' : 'single';
+    const existingRelease = findExistingRelease(existing, album.collectionName);
+    const trackCount = trackItems.length || album.trackCount;
+    const type = existingRelease?.type ?? inferType(album.collectionName, trackCount);
+    const id = existingRelease?.id ?? `${type}-${album.collectionId}`;
+    const title = existingRelease?.title ?? cleanTitle(album.collectionName);
 
     const tracks = trackItems.map(track => {
-      const trackManual = preserveTrackManualUrls(existing, album.id, track.id);
+      const existingTrack = findExistingTrack(existingRelease, track.trackName);
       return {
-        trackNumber: track.track_number,
-        title: track.name,
-        spotifyId: track.id,
-        spotifyUrl: track.external_urls?.spotify ?? '',
-        appleMusicUrl: trackManual.appleMusicUrl,
-        amazonMusicUrl: trackManual.amazonMusicUrl,
-        youtubeUrl: trackManual.youtubeUrl,
-        durationMs: track.duration_ms ?? 0,
-        durationFormatted: formatDuration(track.duration_ms ?? 0),
-        isExplicit: track.explicit ?? false,
+        trackNumber: track.trackNumber,
+        title: existingTrack?.title ?? track.trackName,
+        spotifyId: existingTrack?.spotifyId ?? null,
+        spotifyUrl: existingTrack?.spotifyUrl ?? null,
+        appleMusicUrl: track.trackViewUrl ?? existingTrack?.appleMusicUrl ?? null,
+        amazonMusicUrl: existingTrack?.amazonMusicUrl ?? null,
+        youtubeUrl: existingTrack?.youtubeUrl ?? null,
+        durationMs: track.trackTimeMillis ?? existingTrack?.durationMs ?? 0,
+        durationFormatted: formatDuration(track.trackTimeMillis ?? existingTrack?.durationMs ?? 0),
+        isExplicit: track.trackExplicitness === 'explicit',
       };
     });
 
     releases.push({
-      id: `${releaseType}-${album.id}`,
-      type: releaseType,
-      title: album.name,
-      releaseDate: album.release_date,
-      year: parseInt(album.release_date.slice(0, 4), 10),
-      spotifyId: album.id,
-      spotifyUrl: album.external_urls?.spotify ?? '',
-      appleMusicUrl: manual.appleMusicUrl,
-      amazonMusicUrl: manual.amazonMusicUrl,
-      youtubePlaylistUrl: manual.youtubePlaylistUrl,
-      youtubeUrl: manual.youtubeUrl,
-      artworkUrl: bestArtworkUrl(album.images),
-      artworkUrlSmall: smallArtworkUrl(album.images),
-      totalTracks: album.total_tracks ?? trackItems.length,
+      id,
+      type,
+      title,
+      releaseDate: album.releaseDate?.slice(0, 10) ?? existingRelease?.releaseDate ?? '',
+      year: parseInt(album.releaseDate?.slice(0, 4) ?? existingRelease?.year ?? '0', 10),
+      spotifyId: existingRelease?.spotifyId ?? null,
+      spotifyUrl: existingRelease?.spotifyUrl ?? null,
+      appleMusicUrl: album.collectionViewUrl ?? existingRelease?.appleMusicUrl ?? null,
+      amazonMusicUrl: existingRelease?.amazonMusicUrl ?? null,
+      youtubePlaylistUrl: existingRelease?.youtubePlaylistUrl ?? null,
+      youtubeUrl: existingRelease?.youtubeUrl ?? null,
+      artworkUrl: largeArtworkUrl(album.artworkUrl100),
+      artworkUrlSmall: smallArtworkUrl(album.artworkUrl100),
+      totalTracks: trackCount,
       tracks,
     });
 
@@ -236,14 +198,13 @@ async function main() {
   const output = {
     lastUpdated: new Date().toISOString().slice(0, 10),
     artistName: 'Jade Three',
-    spotifyArtistId: ARTIST_ID,
     releases,
   };
 
   writeFileSync(OUTPUT_PATH, JSON.stringify(output, null, 2) + '\n');
   console.log(`\nWrote ${releases.length} releases to ${OUTPUT_PATH}`);
   console.log('\nNext steps:');
-  console.log('  • Add appleMusicUrl, amazonMusicUrl, youtubeUrl to any new entries');
+  console.log('  • Add spotifyId, spotifyUrl, amazonMusicUrl, youtubeUrl to any new entries');
   console.log('  • git add src/data/releases.json && git commit -m "update releases"');
 }
 
