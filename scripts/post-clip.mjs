@@ -3,8 +3,11 @@
  * Posts a random approved, unsent clip from clips.yaml to Bluesky.
  *
  * Usage:
- *   node scripts/post-clip.mjs            # post for real
- *   node scripts/post-clip.mjs --dry-run  # preview without posting
+ *   node scripts/post-clip.mjs                     # post a random approved clip from any song
+ *   node scripts/post-clip.mjs --slug <slug>        # post a random approved clip from one song
+ *   node scripts/post-clip.mjs --dry-run            # preview without posting
+ *
+ * When multiple eligible clips exist (across all songs or within a slug), one is chosen at random.
  *
  * Required env vars:
  *   BLUESKY_HANDLE        your handle, e.g. jadethree.bsky.social
@@ -16,12 +19,23 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
 
+// Load .env if present
+const __envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env');
+if (fs.existsSync(__envPath)) {
+  for (const line of fs.readFileSync(__envPath, 'utf-8').split('\n')) {
+    const m = line.match(/^([A-Z0-9_]+)=(.+)$/);
+    if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2].trim();
+  }
+}
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const CLIPS_FILE = path.join(ROOT, 'clips.yaml');
 const BSKY_API = 'https://bsky.social/xrpc';
 
 const DRY_RUN = process.argv.includes('--dry-run') || process.argv.includes('-n');
+const SLUG_IDX = process.argv.indexOf('--slug');
+const SLUG_FILTER = SLUG_IDX !== -1 ? process.argv[SLUG_IDX + 1] : null;
 const BSKY_HEADERS = { 'User-Agent': 'jade-three-bot/1.0' };
 
 // ── Clip loading ──────────────────────────────────────────────────────────────
@@ -32,6 +46,7 @@ function loadEligibleClips() {
 
   const eligible = [];
   for (const song of songs) {
+    if (SLUG_FILTER && song.slug !== SLUG_FILTER) continue;
     for (const clip of song.clips ?? []) {
       if (clip.approved === true && clip.sent === false) {
         eligible.push({ slug: song.slug, text: clip.text.trim() });
