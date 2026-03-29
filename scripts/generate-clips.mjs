@@ -40,6 +40,7 @@ Requirements:
 - Mix first-person clips (using Jade Three's own voice from the interview) and third-person clips
 - Jade Three's pronouns are he/him — use them in third-person clips
 - Light editing is fine — keep the authentic voice, just sharpen for social media
+- About 1 in 4 clips should end with a short engagement question (e.g. "What do you think?", "Give it a listen — what stands out to you?", "What does this one make you feel?"). Vary the questions; don't use the same one twice.
 - Separate each clip with "---" on its own line
 - Return ONLY the clips, nothing else
 
