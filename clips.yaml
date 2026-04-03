@@ -40,7 +40,7 @@
         https://jadethreemusic.com/releases/stinger
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         "People were surprised I could make something that sounded musical without a lot of formal music training. Honestly, I was pretty surprised myself."
 
@@ -343,7 +343,7 @@
         https://jadethreemusic.com/releases/didnt-you-want-something
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         "I was just happy to make something that sounded musical." — Jade Three on the origins of Didn't You Want Something?
 
@@ -723,7 +723,7 @@
         https://jadethreemusic.com/releases/its-a-trap
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         "There's a storm in my head." A sampled line buried in an otherwise instrumental track — and somehow it says everything.
 
@@ -866,7 +866,7 @@
         https://jadethreemusic.com/releases/obey-early
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         Layered drums, acid synths, shifting filters, textural vocals — and underneath it all, something genuinely delicate. That's "Obey Early."
 
@@ -1249,7 +1249,7 @@
         https://jadethreemusic.com/releases/fall-in-love
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         At 1:13, the bouncy sound sneaks into the background. Easy to miss — worth catching.
 
