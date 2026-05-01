@@ -1,7 +1,37 @@
 {
-  "lastUpdated": "2026-03-28",
+  "lastUpdated": "2026-05-01",
   "artistName": "Jade Three",
   "releases": [
+    {
+      "id": "single-1895755483",
+      "type": "single",
+      "title": "Like a Better Man",
+      "releaseDate": "2026-04-15",
+      "year": 2026,
+      "spotifyId": "7fUGwANXyegaFQEparMgvc",
+      "spotifyUrl": "https://open.spotify.com/album/7fUGwANXyegaFQEparMgvc",
+      "appleMusicUrl": "https://music.apple.com/us/album/like-a-better-man-single/1895755483?uo=4",
+      "amazonMusicUrl": null,
+      "youtubePlaylistUrl": null,
+      "youtubeUrl": "https://www.youtube.com/watch?v=jVR6l0lQEEQ",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/35/64/1c/35641ced-2164-9de4-f781-83c7f768f744/5063958686349_cover.jpg/600x600bb.jpg",
+      "artworkUrlSmall": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/35/64/1c/35641ced-2164-9de4-f781-83c7f768f744/5063958686349_cover.jpg/64x64bb.jpg",
+      "totalTracks": 1,
+      "tracks": [
+        {
+          "trackNumber": 1,
+          "title": "Like a Better Man",
+          "spotifyId": "7LdvvcVcuKigWOxmcPMrPG",
+          "spotifyUrl": "https://open.spotify.com/track/7LdvvcVcuKigWOxmcPMrPG",
+          "appleMusicUrl": "https://music.apple.com/us/album/like-a-better-man/1895755483?i=6764378000&uo=4",
+          "amazonMusicUrl": null,
+          "youtubeUrl": "https://www.youtube.com/watch?v=jVR6l0lQEEQ",
+          "durationMs": 394500,
+          "durationFormatted": "6:35",
+          "isExplicit": false
+        }
+      ]
+    },
     {
       "id": "single-1888734107",
       "type": "single",
