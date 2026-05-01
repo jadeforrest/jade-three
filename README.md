@@ -24,15 +24,28 @@ npm run preview   # preview production build
 | `clips.yaml` | Approved/sent Bluesky clips |
 | `scripts/` | Data-fetching and posting scripts |
 
-## Updating releases
+## Adding a new release
 
-Release data lives in `src/data/releases.json`. Scripts are available to sync data from each platform:
+Run the `/new-release` skill in Claude Code. It walks through the full workflow:
+
+1. Syncs release data from iTunes (`npm run fetch-releases`)
+2. Identifies which releases don't have a song page yet
+3. Asks for any missing platform URLs (Spotify, YouTube)
+4. Creates `src/content/songs/<slug>.md` with frontmatter
+5. Conducts a short interview and writes the answers into the file
+6. Generates Bluesky clips for the new song
+
+To start: open Claude Code in this directory and type `/new-release`.
+
+### Updating release data only
+
+To pull the latest iTunes data without going through the full workflow:
 
 ```bash
-npm run fetch-releases      # sync from Spotify (requires .env with Spotify credentials)
+npm run fetch-releases      # syncs from iTunes (no credentials required)
 ```
 
-After syncing, manually add `amazonMusicUrl` for any new entries, then commit the updated JSON.
+This preserves any existing Spotify/YouTube/Amazon links in `releases.json`.
 
 ## Tests
 

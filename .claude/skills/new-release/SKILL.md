@@ -1,7 +1,4 @@
----
-name: new-release
-description: Full workflow for adding a new release to the site — syncs from iTunes, collects platform URLs, creates the song content page, conducts the Q&A interview, generates clips, and ends with a retrospective.
----
+# /new-release — Add a new release to the site
 
 You are helping Jade Three add a new release to his music site. Work through the following steps in order. Be conversational — this should feel like a collaborative session, not a checklist.
 
@@ -66,22 +63,29 @@ Conduct a casual, magazine-style interview. Ask questions one at a time (or in n
 
 **Always include at least two of these core questions:**
 - What's the song about?
-- Where did the idea come from?
-- How did it come together in the studio/production?
+- Walk me through how this one started — what was the very first thing you had?
 
 **Rotate freely from these — pick what fits the song and feels fresh:**
-- What was the very first thing you had — a beat, a melody, a sound, a vibe?
-- Was there a turning point in production where the song clicked into place?
-- What software, instruments, or plugins were central to the sound?
-- Were there any happy accidents or unexpected discoveries along the way?
-- Did any earlier versions get scrapped? What were they like?
-- What feeling were you trying to chase with this one?
-- Who or what were you listening to when you were making this?
-- What's your favourite moment in the track?
-- Is there anything in the arrangement that listeners might not notice on first listen?
-- Any lyrics you're especially proud of? (skip or answer "N/A — instrumental" if no lyrics)
-- If this song were a scene in a film, what would be happening?
-- How does this one sit alongside your other releases — is it a departure, a continuation, something else?
+- Was there a moment during production when you knew this one was actually good? What tipped you off?
+- What's a production choice on this track you're especially happy with — something deliberate that might not be obvious to the listener?
+- Did any earlier versions of this go in a completely different direction? What killed them?
+- What sounds or textures define this track for you, and how did you find them?
+- What were you listening to obsessively while you were making this?
+- If you had to describe the emotional territory of this track in two or three words, what would they be?
+- Is there a moment in the arrangement you hid there specifically for the attentive listener?
+- What did this track teach you — about production, about what you want to do more of?
+- How does this one fit into the arc of your work — evolution, departure, or return to something?
+- What would you do differently if you started it from scratch today?
+- What's the title about — was it obvious from the start, or did it take a while to land on?
+- If this song were a scene in a film, describe what's on screen.
+- Any lyrics you're especially proud of? (answer "N/A — instrumental" if no lyrics)
+
+**For EPs, also include at least one of these about the collection as a whole:**
+- What made these tracks feel like they belonged together — was that intentional from the start or did you discover it?
+- How did you decide on the running order?
+- Is there an arc across the EP — does it take the listener somewhere specific?
+- What does the EP title mean to you?
+- Was there a track that almost made the cut but didn't?
 
 Write every answer in Jade Three's first-person voice, casual and direct, exactly as he says it. Don't summarize or clean up his phrasing unnecessarily.
 
