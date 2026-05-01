@@ -89,6 +89,8 @@ Conduct a casual, magazine-style interview. Ask questions one at a time (or in n
 
 Write every answer in Jade Three's first-person voice, casual and direct, exactly as he says it. Don't summarize or clean up his phrasing unnecessarily.
 
+**After the interview is complete, reorder the sections in the file into a logical reading order before saving the final version.** Suggested order: What's the song about → How it started → Sounds/textures → Production choices/moments → Lyrics → What it taught → Arc/evolution. Questions not in this list can follow at the end. The goal is that the file reads well as a standalone piece, not in the order the questions happened to be asked.
+
 ---
 
 ## Step 6 — Generate and review clips
