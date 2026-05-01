@@ -21,7 +21,8 @@ npm run preview   # preview production build
 | `src/content/songs/*.md` | Per-song notes and metadata |
 | `src/content/artist/profile.md` | Artist bio/profile |
 | `src/components/` | Astro UI components |
-| `scripts/` | Data-fetching scripts |
+| `clips.yaml` | Approved/sent Bluesky clips |
+| `scripts/` | Data-fetching and posting scripts |
 
 ## Updating releases
 
@@ -38,12 +39,24 @@ After syncing, manually add `amazonMusicUrl` for any new entries, then commit th
 ## Tests
 
 ```bash
-npx playwright test
+npm test                    # Playwright end-to-end tests
+npm run test:scripts        # unit tests for post-clip.mjs
 ```
 
 ## Posting clips to Bluesky
 
-`scripts/post-clip.mjs` picks a random approved, unsent clip from `clips.yaml` and posts it to Bluesky with a link card.
+`scripts/post-clip.mjs` picks a random approved, unsent clip from `clips.yaml` and posts it to Bluesky with a link card. A launchd job (`scripts/com.jade.jade3-to-bluesky.plist`) runs this automatically on Tue/Thu/Sat at 1:14 PM.
+
+### Generating clips
+
+`scripts/generate-clips.mjs` uses Claude to generate social media clips for each song from its markdown notes in `src/content/songs/`. Output is written to `clips.yaml`.
+
+```bash
+node scripts/generate-clips.mjs              # all songs
+node scripts/generate-clips.mjs stinger      # one song by slug
+```
+
+Re-running skips songs that already have entries in `clips.yaml`. To regenerate a song, delete its entry first.
 
 ### 1. Get a Bluesky app password
 
