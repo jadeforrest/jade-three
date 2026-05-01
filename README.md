@@ -30,8 +30,6 @@ Release data lives in `src/data/releases.json`. Scripts are available to sync da
 
 ```bash
 npm run fetch-releases      # sync from Spotify (requires .env with Spotify credentials)
-npm run fetch-apple-music   # fetch Apple Music URLs interactively
-npm run fetch-youtube       # fetch YouTube URLs interactively
 ```
 
 After syncing, manually add `amazonMusicUrl` for any new entries, then commit the updated JSON.

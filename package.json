@@ -7,8 +7,6 @@
     "build": "astro build",
     "preview": "astro preview",
     "fetch-releases": "node scripts/fetch-releases.js",
-    "fetch-apple-music": "node scripts/fetch-apple-music.js",
-    "fetch-youtube": "node scripts/fetch-youtube.js",
     "test": "playwright test",
     "test:scripts": "node --test tests/post-clip.test.mjs"
   },
