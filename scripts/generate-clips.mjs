@@ -18,6 +18,17 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
+
+// Load .env from project root if present (without requiring dotenv)
+const envFile = path.join(ROOT, '.env');
+if (fs.existsSync(envFile)) {
+  for (const line of fs.readFileSync(envFile, 'utf-8').split('\n')) {
+    const m = line.match(/^(?:export\s+)?([A-Za-z_]\w*)=(.*)$/);
+    if (m && !(m[1] in process.env)) {
+      process.env[m[1]] = m[2].replace(/^(['"])(.*)\1$/, '$2');
+    }
+  }
+}
 const SONGS_DIR = path.join(ROOT, 'src/content/songs');
 const OUTPUT_FILE = path.join(ROOT, 'clips.yaml');
 const BASE_URL = 'https://jadethreemusic.com/releases';
