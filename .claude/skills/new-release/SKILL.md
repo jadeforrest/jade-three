@@ -18,11 +18,27 @@ Read `src/data/releases.json`. Then list all `releaseId` values from the frontma
 
 ## Step 3 — Collect missing platform URLs
 
-For the chosen release, check its entry in `releases.json`:
-- For singles: check `spotifyUrl` and `youtubeUrl`
-- For EPs: check `spotifyUrl` and `youtubePlaylistUrl`
+`scripts/fetch-releases.js` pulls from iTunes only, so it always writes `null` for every Spotify field — both release-level and track-level. All of them have to be filled in by hand here.
 
-For any that are `null` or missing, ask the user to provide them (ask for all missing ones at once, not one at a time). Once provided, edit `src/data/releases.json` to add those values to the correct release entry.
+For the chosen release, check its entry in `releases.json`:
+- Release level, singles: `spotifyUrl` / `spotifyId` and `youtubeUrl`
+- Release level, EPs: `spotifyUrl` / `spotifyId` and `youtubePlaylistUrl`
+- **Track level, every track: `spotifyId` and `spotifyUrl`**
+
+For any that are `null` or missing, ask the user to provide them (ask for all missing ones at once, not one at a time). Once provided, edit `src/data/releases.json` to add those values to the correct release and track entries.
+
+**Do not skip the track-level `spotifyId` — this is the field that broke the Lickin release.** The card players on the homepage and the song page embed the *track*, not the album, so a missing track `spotifyId` means no player. The card has no artwork of its own — the Spotify iframe *is* the visible body of the card — so a broken embed makes the release look like it never got added at all.
+
+If you only have the album URL, get the track ID from the album's embed page:
+```bash
+curl -s -H "User-Agent: Mozilla/5.0" "https://open.spotify.com/embed/album/<albumId>" | grep -o '"uri":"spotify:track:[A-Za-z0-9]*"' | sort -u
+```
+
+Verify every ID before writing it — a valid one returns JSON, a bad one returns an empty body:
+```bash
+curl -s "https://open.spotify.com/oembed?url=https://open.spotify.com/track/<trackId>"
+```
+Note that `https://open.spotify.com/embed/track/<badId>` returns HTTP 200 regardless and only renders "Page not found" inside the iframe, so a status-code check proves nothing — use the oEmbed endpoint.
 
 ---
 
@@ -101,6 +117,16 @@ node scripts/generate-clips.mjs <slug>
 ```
 
 Show the user the newly generated clips from `clips.yaml` for this song. Ask if anything should be tweaked (they can ask you to edit the song page and regenerate). Then ask: **"Would you like to post one of these clips now?"**
+
+---
+
+## Step 6b — Verify the release renders
+
+Run `npm run build`, then confirm the new release's embed points at a *track* ID and not an album ID:
+```bash
+grep -o "open.spotify.com/embed/[a-z]*/[A-Za-z0-9]*" dist/index.html | sort -u
+```
+Singles must appear as `embed/track/...`; only EPs/albums should appear as `embed/album/...`. Then start the dev server and take a screenshot of the release card — confirm the player shows artwork and a Preview button rather than an empty box.
 
 ---
 
