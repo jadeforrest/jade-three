@@ -9,7 +9,11 @@ interface Props {
 }
 
 const { release, slug } = Astro.props;
-const embedId = release.tracks[0]?.spotifyId ?? release.spotifyId;
+// Prefer the track embed; fall back to the album embed when the track ID is
+// missing, since an album ID in a /embed/track URL renders "Page not found".
+const trackId = release.tracks[0]?.spotifyId;
+const embedId = trackId ?? release.spotifyId;
+const embedType = trackId ? 'track' : 'album';
 const releaseDate = new Date(release.releaseDate + 'T12:00:00');
 const formattedDate = releaseDate.toLocaleDateString('en-US', {
   year: 'numeric',
@@ -37,7 +41,7 @@ const formattedDate = releaseDate.toLocaleDateString('en-US', {
 
   <!-- Spotify embed -->
   <div class="px-4 flex-1">
-    <SpotifyEmbed spotifyId={embedId} type="track" height={152} />
+    <SpotifyEmbed spotifyId={embedId} type={embedType} height={152} />
   </div>
 
   <!-- Platform links -->
