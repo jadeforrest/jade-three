@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://jadethreemusic.com/sitemap-index.xml
