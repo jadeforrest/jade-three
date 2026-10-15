@@ -18,27 +18,41 @@ Read `src/data/releases.json`. Then list all `releaseId` values from the frontma
 
 ## Step 3 — Collect missing platform URLs
 
-`scripts/fetch-releases.js` pulls from iTunes only, so it always writes `null` for every Spotify field — both release-level and track-level. All of them have to be filled in by hand here.
+`scripts/fetch-releases.js` pulls from iTunes only, so it always writes `null` for every Spotify field — both release-level and track-level.
 
-For the chosen release, check its entry in `releases.json`:
-- Release level, singles: `spotifyUrl` / `spotifyId` and `youtubeUrl`
-- Release level, EPs: `spotifyUrl` / `spotifyId` and `youtubePlaylistUrl`
-- **Track level, every track: `spotifyId` and `spotifyUrl`**
+**Ask the user for only two things**, and only if they aren't already filled in:
 
-For any that are `null` or missing, ask the user to provide them (ask for all missing ones at once, not one at a time). Once provided, edit `src/data/releases.json` to add those values to the correct release and track entries.
+1. The **Spotify album URL** for the release (`https://open.spotify.com/album/<albumId>`)
+2. The **YouTube URL** (`youtubeUrl` for singles, `youtubePlaylistUrl` for EPs)
 
-**Do not skip the track-level `spotifyId` — this is the field that broke the Lickin release.** The card players on the homepage and the song page embed the *track*, not the album, so a missing track `spotifyId` means no player. The card has no artwork of its own — the Spotify iframe *is* the visible body of the card — so a broken embed makes the release look like it never got added at all.
+Ask for both in one message. Do **not** ask for track IDs — derive every one of them yourself from the album URL. The user rarely has them to hand, and a field nobody has to remember is a field nobody can forget.
 
-If you only have the album URL, get the track ID from the album's embed page:
+### Derive the track IDs
+
+The album's embed page lists every track URI in order:
 ```bash
 curl -s -H "User-Agent: Mozilla/5.0" "https://open.spotify.com/embed/album/<albumId>" | grep -o '"uri":"spotify:track:[A-Za-z0-9]*"' | sort -u
 ```
 
-Verify every ID before writing it — a valid one returns JSON, a bad one returns an empty body:
+For an EP, match the returned IDs to tracks by position — then confirm the mapping by checking each one's title in the verification step below, since `sort -u` does not preserve track order.
+
+### Verify before writing
+
+Check every ID — release and track — against the oEmbed endpoint. A valid one returns JSON including the title; a bad one returns an empty body:
 ```bash
 curl -s "https://open.spotify.com/oembed?url=https://open.spotify.com/track/<trackId>"
 ```
-Note that `https://open.spotify.com/embed/track/<badId>` returns HTTP 200 regardless and only renders "Page not found" inside the iframe, so a status-code check proves nothing — use the oEmbed endpoint.
+Confirm the returned `"title"` matches the track you're about to assign it to. `https://open.spotify.com/embed/track/<badId>` returns HTTP 200 regardless and only renders "Page not found" inside the iframe, so a status-code check proves nothing.
+
+### Then write them in
+
+Edit `src/data/releases.json` and set, for the chosen release:
+- Release level: `spotifyId` (the album ID), `spotifyUrl` (the album URL), and `youtubeUrl` / `youtubePlaylistUrl`
+- **Track level, every track: `spotifyId` and `spotifyUrl` (the track URL, not the album URL)**
+
+**The track-level `spotifyId` is the field that broke the Lickin release.** The card players on the homepage and the song page embed the *track*, not the album, so a missing track `spotifyId` means no player. The card has no artwork of its own — the Spotify iframe *is* the visible body of the card — so a broken embed makes the release look like it never got added at all. Step 6b exists to catch this; don't rely on it.
+
+Leave `amazonMusicUrl` as `null` unless the user volunteers it.
 
 ---
 

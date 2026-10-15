@@ -33,14 +33,17 @@ const SONGS_DIR = path.join(ROOT, 'src/content/songs');
 const OUTPUT_FILE = path.join(ROOT, 'clips.yaml');
 const BASE_URL = 'https://jadethreemusic.com/releases';
 
-const client = new Anthropic();
+let _client;
+function client() {
+  return (_client ??= new Anthropic());
+}
 
 async function generateClips(content, url) {
   const maxTextLen = 300 - url.length - 2; // -2 for the "\n\n" before the URL
 
-  const message = await client.messages.create({
+  const message = await client().messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
+    max_tokens: 4096,
     system: 'You write social media posts. Return only the requested clips — no preamble, no commentary, no numbering.',
     messages: [{
       role: 'user',
@@ -71,15 +74,63 @@ ${content}`,
     })
     .filter(Boolean);
 
-  // Warn if any clip is over budget
-  for (const clip of clips) {
-    const full = clip + '\n\n' + url;
-    if (full.length > 300) {
-      process.stderr.write(`  ⚠ Clip over 300 chars (${full.length}): ${clip.slice(0, 60)}…\n`);
-    }
+  const { kept, warnings } = validateClips(clips, url, message.stop_reason);
+  for (const w of warnings) process.stderr.write(`  ${w}\n`);
+
+  return kept;
+}
+
+// ── Validation ───────────────────────────────────────────────────────────────
+
+// A clip is only usable if it reads as a finished thought. Anything else is a
+// generation artifact, not a draft worth reviewing.
+const TERMINAL_PUNCTUATION = /[.!?…](["'”’)\]]*)$/;
+
+/**
+ * Filter a generated batch down to the clips worth writing out.
+ *
+ * Drops clips that end mid-sentence — a truncated clip is never salvageable by
+ * a reviewer skimming clips.yaml, and one slipped through into the La Mítica
+ * batch when max_tokens cut off the final clip.
+ *
+ * Over-budget clips are kept and warned about: they're still readable and the
+ * reviewer can trim them.
+ *
+ * @param {string[]} clips    raw clip texts, URL already stripped
+ * @param {string}   url      the URL appended to every post
+ * @param {string}   [stopReason] the API stop_reason, if known
+ * @returns {{ kept: string[], warnings: string[] }}
+ */
+export function validateClips(clips, url, stopReason) {
+  const kept = [];
+  const warnings = [];
+
+  if (stopReason === 'max_tokens') {
+    warnings.push('⚠ Response hit max_tokens — the final clip was likely cut off.');
   }
 
-  return clips;
+  for (const clip of clips) {
+    const preview = clip.slice(0, 60);
+
+    if (!TERMINAL_PUNCTUATION.test(clip)) {
+      warnings.push(`⚠ Dropped clip ending mid-sentence: …${clip.slice(-40)}`);
+      continue;
+    }
+
+    const full = `${clip}\n\n${url}`;
+    if (full.length > 300) {
+      warnings.push(`⚠ Clip over 300 chars (${full.length}), kept for trimming: ${preview}…`);
+    }
+
+    kept.push(clip);
+  }
+
+  const dropped = clips.length - kept.length;
+  if (dropped > 0) {
+    warnings.push(`⚠ ${dropped} of ${clips.length} clip(s) dropped as unusable.`);
+  }
+
+  return { kept, warnings };
 }
 
 // ── YAML builder ──────────────────────────────────────────────────────────────
@@ -178,7 +229,12 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error(err.message);
-  process.exit(1);
-});
+const invokedDirectly =
+  process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (invokedDirectly) {
+  main().catch(err => {
+    console.error(err.message);
+    process.exit(1);
+  });
+}

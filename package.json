@@ -8,7 +8,7 @@
     "preview": "astro preview",
     "fetch-releases": "node scripts/fetch-releases.js",
     "test": "playwright test",
-    "test:scripts": "node --test tests/post-clip.test.mjs"
+    "test:scripts": "node --test tests/post-clip.test.mjs tests/generate-clips.test.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

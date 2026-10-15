@@ -131,6 +131,51 @@ const embedHeight = release.type === 'single' ? 152 : 352;
     margin-top: 0;
   }
 
+  /* Bilingual lyric sheet: original left, translation right */
+  .prose-song :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .prose-song :global(thead th) {
+    font-family: var(--font-body);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+    text-align: left;
+    padding: 0 1rem 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .prose-song :global(tbody td) {
+    padding: 0.45rem 1rem 0.45rem 0;
+    vertical-align: top;
+    color: var(--color-text-body);
+  }
+
+  /* Translation column reads as secondary */
+  .prose-song :global(tbody td:last-child) {
+    padding-right: 0;
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  @media (max-width: 34rem) {
+    .prose-song :global(table) {
+      font-size: 0.82rem;
+    }
+
+    .prose-song :global(thead th),
+    .prose-song :global(tbody td) {
+      padding-right: 0.6rem;
+    }
+  }
+
   /* Answer text */
   .prose-song :global(p) {
     font-size: 1rem;
