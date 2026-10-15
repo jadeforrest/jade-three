@@ -42,8 +42,11 @@ async function generateClips(content, url) {
   const maxTextLen = 300 - url.length - 2; // -2 for the "\n\n" before the URL
 
   const message = await client().messages.create({
-    model: 'claude-sonnet-4-6',
+    model: 'claude-sonnet-5-5',
     max_tokens: 4096,
+    // Sonnet 5.5 thinks by default and defaults to high effort. Clip writing
+    // doesn't need the depth, so keep the spend near the old no-thinking cost.
+    output_config: { effort: 'low' },
     system: 'You write social media posts. Return only the requested clips — no preamble, no commentary, no numbering.',
     messages: [{
       role: 'user',
@@ -65,19 +68,37 @@ ${content}`,
     }],
   });
 
-  const raw = message.content[0].text.trim();
-  const clips = raw
-    .split(/^---\s*$/m)
-    .map(c => {
-      // Claude sometimes appends the URL despite being told not to — strip it
-      return c.trim().replace(new RegExp(`\\s*${url.replace(/\//g, '\\/')}\\s*$`), '').trim();
-    })
-    .filter(Boolean);
+  const clips = parseClips(message.content, url);
 
   const { kept, warnings } = validateClips(clips, url, message.stop_reason);
   for (const w of warnings) process.stderr.write(`  ${w}\n`);
 
   return kept;
+}
+
+// ── Response parsing ─────────────────────────────────────────────────────────
+
+/**
+ * Pull the clip texts out of a Messages API response body.
+ *
+ * `content` is a union of block types, and Sonnet 5.5 thinks by default, so the
+ * text is not reliably `content[0]` — a thinking block can come first. A
+ * response carrying no text block at all (a refusal, for instance) yields no
+ * clips rather than throwing.
+ *
+ * @param {Array<{type: string, text?: string}>} content  response content blocks
+ * @param {string} url  the song URL, stripped when the model appends it anyway
+ * @returns {string[]} clip texts, trimmed, in order, with empties removed
+ */
+export function parseClips(content, url) {
+  const raw = ((content ?? []).find(b => b.type === 'text')?.text ?? '').trim();
+  // Escape the URL before it becomes a regex — it is interpolated, not literal.
+  const trailingUrl = new RegExp(`\\s*${url.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&')}\\s*$`);
+
+  return raw
+    .split(/^---\s*$/m)
+    .map(c => c.trim().replace(trailingUrl, '').trim())
+    .filter(Boolean);
 }
 
 // ── Validation ───────────────────────────────────────────────────────────────
@@ -98,7 +119,8 @@ const TERMINAL_PUNCTUATION = /[.!?…](["'”’)\]]*)$/;
  *
  * @param {string[]} clips    raw clip texts, URL already stripped
  * @param {string}   url      the URL appended to every post
- * @param {string}   [stopReason] the API stop_reason, if known
+ * @param {string}   [stopReason] the API stop_reason, if known ('max_tokens'
+ *                                and 'refusal' each add their own warning)
  * @returns {{ kept: string[], warnings: string[] }}
  */
 export function validateClips(clips, url, stopReason) {
@@ -107,6 +129,12 @@ export function validateClips(clips, url, stopReason) {
 
   if (stopReason === 'max_tokens') {
     warnings.push('⚠ Response hit max_tokens — the final clip was likely cut off.');
+  }
+
+  // A refusal returns HTTP 200 with no text, which otherwise reads as a song
+  // that simply produced nothing. Say so instead.
+  if (stopReason === 'refusal') {
+    warnings.push('⚠ The model declined this song — no clips generated.');
   }
 
   for (const clip of clips) {

@@ -58,6 +58,17 @@ test('does not warn about the ceiling on a normal stop', () => {
   assert.equal(warnings.length, 0);
 });
 
+test('warns when the model refused the song', () => {
+  const { warnings } = validateClips([], URL, 'refusal');
+  assert.ok(warnings.some(w => w.includes('declined')));
+});
+
+test('a refusal with no clips reports the refusal, not an empty batch', () => {
+  const { kept, warnings } = validateClips([], URL, 'refusal');
+  assert.deepEqual(kept, []);
+  assert.ok(!warnings.some(w => w.includes('dropped as unusable')));
+});
+
 test('handles an empty batch', () => {
   const { kept, warnings } = validateClips([], URL);
   assert.deepEqual(kept, []);

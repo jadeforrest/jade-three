@@ -8,7 +8,7 @@
     "preview": "astro preview",
     "fetch-releases": "node scripts/fetch-releases.js",
     "test": "playwright test",
-    "test:scripts": "node --test tests/post-clip.test.mjs tests/generate-clips.test.mjs"
+    "test:scripts": "node --test tests/post-clip.test.mjs tests/generate-clips.test.mjs tests/parse-clips.test.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -18,6 +18,7 @@
     "@anthropic-ai/sdk": "^0.135.0",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "^4.0.6",
+    "fast-check": "^4.10.2",
     "js-yaml": "^4.3.2",
     "tailwindcss": "^4.0.6"
   }
