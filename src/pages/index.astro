@@ -10,7 +10,7 @@ import type { ReleasesData } from '../types/releases';
 
 const data = releasesData as ReleasesData;
 const songs = await getCollection('songs');
-const slugMap = Object.fromEntries(songs.map((s) => [s.data.releaseId, s.slug]));
+const slugMap = Object.fromEntries(songs.map((s) => [s.data.releaseId, s.id]));
 ---
 <BaseLayout
   title="Jade Three — Music"

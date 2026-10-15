@@ -12,12 +12,13 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^5.3.0"
+    "astro": "^7.4.0"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.80.0",
+    "@anthropic-ai/sdk": "^0.135.0",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "^4.0.6",
+    "js-yaml": "^4.3.2",
     "tailwindcss": "^4.0.6"
   }
 }

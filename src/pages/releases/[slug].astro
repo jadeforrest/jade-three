@@ -11,7 +11,7 @@ import type { ReleasesData } from '../../types/releases';
 export async function getStaticPaths() {
   const songs = await getCollection('songs');
   return songs.map((song) => ({
-    params: { slug: song.slug },
+    params: { slug: song.id },
     props: { song },
   }));
 }
