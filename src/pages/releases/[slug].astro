@@ -183,4 +183,9 @@ const embedHeight = release.type === 'single' ? 152 : 352;
     color: var(--color-text-body);
     margin: 0;
   }
+
+  /* Paragraph breaks within a single answer */
+  .prose-song :global(p + p) {
+    margin-top: 1.1rem;
+  }
 </style>
