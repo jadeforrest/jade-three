@@ -113,7 +113,7 @@
   url: https://jadethreemusic.com/releases/barbarians-in-the-gates
   clips:
     - approved: true
-      sent: false
+      sent: true
       text: |
         "The barbarians are already inside the gates." That feeling of unease about the world — that's what this track is about. But really, it's a celebration of the beauty that still exists.
 
@@ -695,7 +695,7 @@
         https://jadethreemusic.com/releases/its-a-trap
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         I found just one sound I liked in a drum kit, pulled it out, and built the whole track around it. Then added a synth to match the note at a lower frequency.
 
@@ -1594,7 +1594,7 @@
         https://jadethreemusic.com/releases/la-mitica
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         Jade Three on "La Mítica": he didn't know what the Spanish lyrics meant at first. When he finally looked them up, it changed how he positioned everything — but working without the meaning at first was also a little freeing.
 
