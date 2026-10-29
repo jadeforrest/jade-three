@@ -134,7 +134,7 @@
         https://jadethreemusic.com/releases/barbarians-in-the-gates
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         I like a slightly rough bass combined with prettier overtones. That tension between rough and pretty — that's the sweet spot I was going for.
 
@@ -873,7 +873,7 @@
         https://jadethreemusic.com/releases/obey-early
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         I'm really happy with how it turned out. "Obey Early" — mostly instrumental, all feeling.
 
@@ -1577,7 +1577,7 @@
         https://jadethreemusic.com/releases/lickin
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         "Lickin" is about the challenges of moving forward. The name says it all — taking your licks and still choosing your way.
 
