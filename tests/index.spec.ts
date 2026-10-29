@@ -20,6 +20,15 @@ test.describe('Jade Three homepage', () => {
     await expect(hero.getByRole('heading', { level: 1 })).toContainText('Jade Three');
   });
 
+  test('hero heading shows the wordmark logo', async ({ page }) => {
+    await page.goto('/');
+    const wordmark = page.locator('section').first().locator('h1 svg');
+    await expect(wordmark).toBeVisible();
+    const box = await wordmark.boundingBox();
+    expect(box!.width).toBeGreaterThan(250);
+    expect(box!.width / box!.height).toBeCloseTo(7190 / 714, 1);
+  });
+
   test('hero has a "Listen" link that scrolls to releases', async ({ page }) => {
     await page.goto('/');
     const listenLink = page.getByRole('link', { name: /listen/i });
