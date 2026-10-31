@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fc from 'fast-check';
-import { clipArgs, coverArgs, encode, parseArgs, parseTime } from '../scripts/encode-media.mjs';
+import { clipArgs, encode, parseArgs, parseTime } from '../scripts/encode-media.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -74,23 +74,11 @@ test('clipArgs trims, normalizes, fades, and encodes at 128k', () => {
   ]);
 });
 
-test('coverArgs strips metadata and caps the width', () => {
-  assert.deepEqual(coverArgs('in.png', 'cover.jpg'), [
-    '-y', '-loglevel', 'error', '-i', 'in.png',
-    '-map_metadata', '-1',
-    '-vf', "scale='min(1400,iw)':-2",
-    '-frames:v', '1', '-update', '1', '-q:v', '3',
-    'cover.jpg',
-  ]);
-});
-
 test('property: the master path stays one argument, whatever it contains', () => {
   fc.assert(
     fc.property(fc.string({ minLength: 1 }), (master) => {
       const clip = clipArgs({ master, start: 0, length: 30 }, 'o.mp3');
       assert.equal(clip[clip.indexOf('-i') + 1], master);
-      const cover = coverArgs(master, 'o.jpg');
-      assert.equal(cover[cover.indexOf('-i') + 1], master);
     }),
   );
 });

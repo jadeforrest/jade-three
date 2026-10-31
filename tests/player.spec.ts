@@ -1,11 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// These run against whatever clips are in src/assets/media, and skip until the
-// site has at least one local player.
+// These run against the real clips in src/assets/media.
 async function firstPlayer(page: Page) {
   await page.goto('/');
   const player = page.locator('[data-player]').first();
-  test.skip((await player.count()) === 0, 'no clips in src/assets/media');
+  await expect(player).toBeVisible();
   return player;
 }
 
@@ -13,6 +12,27 @@ const isPlaying = (player: ReturnType<Page['locator']>) =>
   player.locator('audio').evaluate((audio: HTMLAudioElement) => !audio.paused);
 
 test.describe('local player', () => {
+  test('a release with a clip uses it instead of the Spotify embed', async ({ page }) => {
+    await page.goto('/');
+    const card = page.locator('#releases article').filter({ hasText: "Didn't you want something?" });
+    await expect(card.locator('[data-player]')).toBeVisible();
+    await expect(card.locator('iframe')).toHaveCount(0);
+    await expect(card.locator('[data-player] img')).toHaveAttribute('src', /\/_astro\/.*\.webp/);
+  });
+
+  test('the release page shows the local cover and player', async ({ page }) => {
+    await page.goto('/releases/didnt-you-want-something');
+    await expect(page.locator('[data-player]')).toBeVisible();
+    await expect(page.locator('iframe')).toHaveCount(0);
+    await expect(page.locator('section img').first()).toHaveAttribute('src', /\/_astro\/.*\.webp/);
+  });
+
+  test('a release without clips keeps its Spotify embed', async ({ page }) => {
+    await page.goto('/releases/fall-in-love');
+    await expect(page.locator('iframe[src*="open.spotify.com/embed"]')).toBeVisible();
+    await expect(page.locator('[data-player]')).toHaveCount(0);
+  });
+
   test('nothing downloads until play is pressed', async ({ page }) => {
     const player = await firstPlayer(page);
     const readyState = await player.locator('audio').evaluate((a: HTMLAudioElement) => a.readyState);
@@ -40,15 +60,30 @@ test.describe('local player', () => {
       .toBeGreaterThan(0.4);
   });
 
-  test('only one player plays at a time', async ({ page }) => {
-    await firstPlayer(page);
-    const players = page.locator('[data-player]');
-    test.skip((await players.count()) < 2, 'needs two local players');
-    await players.nth(0).locator('[data-toggle]').click();
-    await expect.poll(() => isPlaying(players.nth(0))).toBe(true);
-    await players.nth(1).locator('[data-toggle]').click();
-    await expect.poll(() => isPlaying(players.nth(1))).toBe(true);
-    await expect.poll(() => isPlaying(players.nth(0))).toBe(false);
+  test('starting another audio element pauses the player', async ({ page }) => {
+    const player = await firstPlayer(page);
+    await player.locator('[data-toggle]').click();
+    await expect(player.locator('[data-toggle]')).toHaveAttribute('aria-label', /^Pause /);
+    // A second copy of the clip stands in for another card's player.
+    await page.evaluate(async () => {
+      const other = document.createElement('audio');
+      other.src = document.querySelector('audio')!.src;
+      other.muted = true;
+      document.body.append(other);
+      await other.play();
+    });
+    await expect.poll(() => isPlaying(player)).toBe(false);
+    await expect(player.locator('[data-toggle]')).toHaveAttribute('aria-label', /^Play /);
+  });
+
+  test('a clip plays to the end and resets', async ({ page }) => {
+    const player = await firstPlayer(page);
+    await player.locator('[data-toggle]').click();
+    await expect.poll(() => isPlaying(player)).toBe(true);
+    await player.locator('audio').evaluate((audio: HTMLAudioElement) => {
+      audio.dispatchEvent(new Event('ended'));
+    });
+    await expect(player.locator('[data-seek]')).toHaveValue('0');
   });
 
   test('a seek made before the clip loads is kept', async ({ page }) => {

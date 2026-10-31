@@ -140,7 +140,7 @@ Ask for the path to the master and where the clip should start. Run this once pe
 ```bash
 node scripts/encode-media.mjs <slug> <track-number> <master> --start 1:05
 ```
-It writes `src/assets/media/<slug>/<NN>.mp3` and, on first run, `cover.jpg` from the release artwork (pass `--cover <file>` to use a different image). Masters stay out of the repo.
+It writes `src/assets/media/<slug>/<NN>.mp3` and, on first run, `cover.jpg` from the release artwork (pass `--cover <file>` to use a different image). Every cover gets the gold E stamped in the lower left by `scripts/stamp-cover.mjs`, so always start from clean artwork. Masters stay out of the repo.
 
 A release uses the local player only once **every** track has a clip; until then it stays on Spotify. If the user has no master to hand, skip this step — the Spotify fallback is fine.
 

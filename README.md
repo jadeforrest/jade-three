@@ -17,6 +17,12 @@ src/assets/media/<slug>/01.mp3
 node scripts/encode-media.mjs <slug> <track> <master> --start 1:05
 ```
 
+Covers get the gold E from `brand/jade-three-e-gold.png` stamped in the lower left. To stamp artwork on its own:
+
+```bash
+node scripts/stamp-cover.mjs <artwork> <output.jpg>
+```
+
 Masters stay out of the repo. Misnamed files and folders with no song page fail the build.
 
 Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com). Deployed on Netlify at [jadethreemusic.com](https://jadethreemusic.com).

@@ -11,7 +11,7 @@
  * use the same slug for every track (e.g. year-until-the-fall-ep).
  *
  * Without --cover, an existing cover.jpg is kept; otherwise the release artwork
- * is downloaded from Apple. Requires ffmpeg.
+ * is downloaded from Apple. Covers get the logo stamp. Requires ffmpeg.
  */
 
 import { execFileSync } from 'child_process';
@@ -19,10 +19,10 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { stampCover } from './stamp-cover.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const FADE_OUT_SECONDS = 2;
-const COVER_SIZE = 1400;
 
 /** Accepts seconds ("95", "12.5") or m:ss ("1:35"). */
 export function parseTime(value) {
@@ -69,16 +69,6 @@ export function clipArgs({ master, start, length }, output) {
   ];
 }
 
-export function coverArgs(input, output) {
-  return [
-    '-y', '-loglevel', 'error', '-i', input,
-    '-map_metadata', '-1',
-    '-vf', `scale='min(${COVER_SIZE},iw)':-2`,
-    '-frames:v', '1', '-update', '1', '-q:v', '3',
-    output,
-  ];
-}
-
 function ffmpeg(args) {
   execFileSync('ffmpeg', args, { stdio: 'inherit' });
 }
@@ -102,7 +92,7 @@ async function downloadArtwork(release, output) {
   try {
     const download = join(tmp, 'artwork.jpg');
     writeFileSync(download, Buffer.from(await res.arrayBuffer()));
-    ffmpeg(coverArgs(download, output));
+    stampCover(download, output);
   } finally {
     rmSync(tmp, { recursive: true });
   }
@@ -110,7 +100,7 @@ async function downloadArtwork(release, output) {
 
 async function writeCover(coverSource, release, output) {
   if (coverSource) {
-    ffmpeg(coverArgs(coverSource, output));
+    stampCover(coverSource, output);
   } else if (!existsSync(output)) {
     await downloadArtwork(release, output);
   }
