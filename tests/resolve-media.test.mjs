@@ -47,6 +47,17 @@ test('rejects misnamed clips', () => {
   }
 });
 
+test('rejects clip names with anything after .mp3', () => {
+  assert.throws(
+    () => buildMediaIndex({ '/src/assets/media/a/01.mp3.mp3': 'u' }, { [coverPath('a')]: 'c' }, ['a']),
+    /must be named like 01\.mp3/,
+  );
+});
+
+test('rejects a file directly in the media root', () => {
+  assert.throws(() => buildMediaIndex({ '/src/assets/media/01.mp3': 'u' }, {}, []), /Unexpected media path/);
+});
+
 test('rejects a folder with no song page', () => {
   assert.throws(() => indexFor('typo', [1], ['stinger']), /no song page: typo/);
 });
@@ -103,6 +114,13 @@ test('rejects a clip for a track the release does not have', () => {
   assert.throws(
     () => resolvePlayer(release('single', [track(1)]), ['s'], indexFor('s', [1, 2])),
     /no track number 2/,
+  );
+});
+
+test('names every stray clip', () => {
+  assert.throws(
+    () => resolvePlayer(release('single', [track(1)]), ['s'], indexFor('s', [1, 2, 3])),
+    /no track number 2, 3 \(s\)/,
   );
 });
 

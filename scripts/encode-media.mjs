@@ -84,11 +84,11 @@ function ffmpeg(args) {
 }
 
 /** The frontmatter releaseId of a song page, looked up in releases.json. */
-function findRelease(slug) {
-  const page = join(ROOT, 'src/content/songs', `${slug}.md`);
+function findRelease(slug, root) {
+  const page = join(root, 'src/content/songs', `${slug}.md`);
   if (!existsSync(page)) throw new Error(`No song page: ${page}`);
   const releaseId = /^releaseId:\s*"(.+)"/m.exec(readFileSync(page, 'utf-8'))?.[1];
-  const { releases } = JSON.parse(readFileSync(join(ROOT, 'src/data/releases.json'), 'utf-8'));
+  const { releases } = JSON.parse(readFileSync(join(root, 'src/data/releases.json'), 'utf-8'));
   const release = releases.find((r) => r.id === releaseId);
   if (!release) throw new Error(`No release for ${slug}: ${releaseId}`);
   return release;
@@ -117,14 +117,14 @@ async function writeCover(coverSource, release, output) {
   console.log(`Cover: ${output}`);
 }
 
-async function main() {
-  const options = parseArgs(process.argv.slice(2));
-  const release = findRelease(options.slug);
+export async function encode(argv, root = ROOT) {
+  const options = parseArgs(argv);
+  const release = findRelease(options.slug, root);
   if (!release.tracks.some((t) => t.trackNumber === options.track)) {
     throw new Error(`"${release.title}" has no track ${options.track}`);
   }
 
-  const folder = join(ROOT, 'src/assets/media', options.slug);
+  const folder = join(root, 'src/assets/media', options.slug);
   mkdirSync(folder, { recursive: true });
 
   const clip = join(folder, `${String(options.track).padStart(2, '0')}.mp3`);
@@ -135,7 +135,7 @@ async function main() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((err) => {
+  encode(process.argv.slice(2)).catch((err) => {
     console.error(err.message);
     process.exit(1);
   });

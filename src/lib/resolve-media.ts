@@ -108,8 +108,7 @@ export function resolvePlayer<Cover>(
     throw new Error(`"${release.title}" has no track number ${stray.join(', ')} (${folders[0]})`);
   }
 
-  const isComplete = release.tracks.length > 0 && media.audio.size === trackNumbers.size;
-  if (!isComplete) return spotifyPlan(release);
+  if (media.audio.size < trackNumbers.size) return spotifyPlan(release);
 
   return {
     kind: 'local',
