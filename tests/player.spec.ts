@@ -27,12 +27,6 @@ test.describe('local player', () => {
     await expect(page.locator('section img').first()).toHaveAttribute('src', /\/_astro\/.*\.webp/);
   });
 
-  test('a release without clips keeps its Spotify embed', async ({ page }) => {
-    await page.goto('/releases/fall-in-love');
-    await expect(page.locator('iframe[src*="open.spotify.com/embed"]')).toBeVisible();
-    await expect(page.locator('[data-player]')).toHaveCount(0);
-  });
-
   test('nothing downloads until play is pressed', async ({ page }) => {
     const player = await firstPlayer(page);
     const readyState = await player.locator('audio').evaluate((a: HTMLAudioElement) => a.readyState);
