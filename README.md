@@ -1,6 +1,23 @@
 # Jade Three
 
-Music website for Jade Three — a chronological showcase of releases with Spotify embeds, platform links, and song notes.
+Music website for Jade Three — a chronological showcase of releases with preview clips (or Spotify embeds), platform links, and song notes.
+
+## Preview clips
+
+A release gets the local player once every track has a clip. Otherwise it uses the Spotify embed, so songs can be converted one at a time.
+
+```
+src/assets/media/<slug>/cover.jpg
+src/assets/media/<slug>/01.mp3
+```
+
+`<slug>` is a song page for the release, and the file number is the track number. Create them with:
+
+```bash
+node scripts/encode-media.mjs <slug> <track> <master> --start 1:05
+```
+
+Masters stay out of the repo. Misnamed files and folders with no song page fail the build.
 
 Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com). Deployed on Netlify at [jadethreemusic.com](https://jadethreemusic.com).
 

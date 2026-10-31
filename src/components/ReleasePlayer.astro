@@ -1,0 +1,185 @@
+---
+import SpotifyEmbed from './SpotifyEmbed.astro';
+import { getCoverUrl, getReleasePlayer } from '../lib/media';
+import type { Release } from '../types/releases';
+
+interface Props {
+  release: Release;
+}
+
+const { release } = Astro.props;
+const player = getReleasePlayer(release);
+const coverUrl = player.kind === 'local' ? await getCoverUrl(player.cover, 240) : '';
+const firstTrack = player.kind === 'local' ? player.tracks[0] : null;
+---
+{player.kind === 'spotify' ? (
+  <SpotifyEmbed spotifyId={player.spotifyId} type={player.type} height={player.height} />
+) : (
+  <div
+    data-player
+    data-title={firstTrack?.title}
+    class="rounded-lg bg-elevated p-3"
+  >
+    <div class="flex items-center gap-3">
+      <img
+        src={coverUrl}
+        alt={`${release.title} artwork`}
+        width="120"
+        height="120"
+        loading="lazy"
+        class="rounded-md shrink-0 size-20 sm:size-[120px]"
+      />
+      <div class="flex-1 min-w-0 flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            data-toggle
+            aria-label={`Play ${firstTrack?.title}`}
+            class="size-11 shrink-0 rounded-full bg-accent text-base flex items-center justify-center hover:bg-accent-light transition-colors duration-150 cursor-pointer disabled:opacity-40"
+          >
+            <svg data-icon-play viewBox="0 0 24 24" class="size-5" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <svg data-icon-pause viewBox="0 0 24 24" class="size-5 hidden" fill="currentColor" aria-hidden="true">
+              <path d="M6 5h4v14H6zm8 0h4v14h-4z" />
+            </svg>
+          </button>
+          <p class="text-xs font-semibold uppercase tracking-widest text-accent">Preview</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input
+            type="range"
+            data-seek
+            aria-label="Seek"
+            min="0"
+            max="100"
+            step="0.1"
+            value="0"
+            class="flex-1 min-w-0 accent-accent cursor-pointer"
+          />
+          <span data-time class="text-xs text-text-muted tabular-nums shrink-0">0:00</span>
+        </div>
+      </div>
+    </div>
+
+    {player.tracks.length > 1 && (
+      <ol class="mt-3 border-t border-white/5 pt-2">
+        {player.tracks.map((track, i) => (
+          <li>
+            <button
+              type="button"
+              data-track
+              data-src={track.src}
+              data-title={track.title}
+              aria-current={i === 0 ? 'true' : 'false'}
+              class="w-full flex items-center gap-3 px-2 py-1.5 rounded-md text-left text-sm text-text-body hover:bg-muted aria-[current=true]:text-accent transition-colors duration-150 cursor-pointer"
+            >
+              <span class="w-5 text-right text-xs tabular-nums shrink-0">{track.trackNumber}</span>
+              <span class="truncate">{track.title}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    )}
+
+    <p data-error hidden class="mt-2 text-xs text-text-muted">
+      Preview unavailable. Use the links below to listen.
+    </p>
+
+    <audio src={firstTrack?.src} preload="none"></audio>
+  </div>
+)}
+
+<script>
+  function formatTime(seconds: number) {
+    const whole = Math.floor(seconds);
+    return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`;
+  }
+
+  function initPlayer(root: HTMLElement) {
+    const audio = root.querySelector('audio')!;
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]')!;
+    const seek = root.querySelector<HTMLInputElement>('[data-seek]')!;
+    const time = root.querySelector<HTMLElement>('[data-time]')!;
+    const tracks = [...root.querySelectorAll<HTMLButtonElement>('[data-track]')];
+    let title = root.dataset.title ?? '';
+    let dragging = false;
+
+    function play() {
+      // A failed load is reported by the audio element's error event.
+      audio.play().catch(() => {});
+    }
+
+    function showPlaying(playing: boolean) {
+      root.querySelector('[data-icon-play]')!.classList.toggle('hidden', playing);
+      root.querySelector('[data-icon-pause]')!.classList.toggle('hidden', !playing);
+      toggle.setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} ${title}`);
+    }
+
+    function selectTrack(button: HTMLButtonElement) {
+      tracks.forEach((track) => track.setAttribute('aria-current', String(track === button)));
+      title = button.dataset.title ?? '';
+      audio.src = button.dataset.src ?? '';
+      seek.value = '0';
+      time.textContent = '0:00';
+      play();
+    }
+
+    toggle.addEventListener('click', () => (audio.paused ? play() : audio.pause()));
+    tracks.forEach((track) => track.addEventListener('click', () => selectTrack(track)));
+
+    seek.addEventListener('pointerdown', () => (dragging = true));
+    seek.addEventListener('pointerup', () => (dragging = false));
+    function seekToSlider() {
+      if (Number.isFinite(audio.duration)) {
+        audio.currentTime = (Number(seek.value) / 100) * audio.duration;
+      }
+    }
+    seek.addEventListener('input', seekToSlider);
+    // preload="none" means the duration is unknown until the first play, so
+    // apply a seek made before then once it arrives.
+    audio.addEventListener('loadedmetadata', seekToSlider);
+
+    audio.addEventListener('play', () => {
+      showPlaying(true);
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({ title, artist: 'Jade Three' });
+      }
+    });
+    audio.addEventListener('pause', () => showPlaying(false));
+    audio.addEventListener('timeupdate', () => {
+      time.textContent = formatTime(audio.currentTime);
+      if (!dragging && Number.isFinite(audio.duration)) {
+        seek.value = String((audio.currentTime / audio.duration) * 100);
+      }
+    });
+    audio.addEventListener('ended', () => {
+      const current = tracks.findIndex((track) => track.getAttribute('aria-current') === 'true');
+      const next = tracks[current + 1];
+      if (next) {
+        selectTrack(next);
+      } else {
+        seek.value = '0';
+        time.textContent = '0:00';
+      }
+    });
+    audio.addEventListener('error', () => {
+      toggle.disabled = true;
+      seek.disabled = true;
+      root.querySelector<HTMLElement>('[data-error]')!.hidden = false;
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-player]').forEach(initPlayer);
+
+  // Only one preview plays at a time. `play` doesn't bubble, so listen on capture.
+  document.addEventListener(
+    'play',
+    (event) => {
+      document.querySelectorAll('audio').forEach((audio) => {
+        if (audio !== event.target) audio.pause();
+      });
+    },
+    true,
+  );
+</script>

@@ -19,9 +19,9 @@ test.describe('Fall in Love release', () => {
     await expect(spotifyLink).toBeVisible();
   });
 
-  test('release page has a Spotify embed', async ({ page }) => {
+  test('release page has a player', async ({ page }) => {
     await page.goto('/releases/fall-in-love');
-    const embed = page.locator('iframe[src*="open.spotify.com/embed"]');
-    await expect(embed).toBeVisible();
+    const player = page.locator('[data-player], iframe[src*="open.spotify.com/embed"]');
+    await expect(player).toBeVisible();
   });
 });

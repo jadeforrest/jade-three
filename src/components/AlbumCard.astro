@@ -1,5 +1,5 @@
 ---
-import SpotifyEmbed from './SpotifyEmbed.astro';
+import ReleasePlayer from './ReleasePlayer.astro';
 import PlatformLinks from './PlatformLinks.astro';
 import type { Release } from '../types/releases';
 
@@ -38,9 +38,9 @@ const formattedDate = releaseDate.toLocaleDateString('en-US', {
     </p>
   </div>
 
-  <!-- Embed -->
+  <!-- Player -->
   <div class="px-6">
-    <SpotifyEmbed spotifyId={release.spotifyId} type="album" />
+    <ReleasePlayer release={release} />
   </div>
 
   <!-- Platform links -->

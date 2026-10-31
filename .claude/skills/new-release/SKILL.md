@@ -50,7 +50,7 @@ Edit `src/data/releases.json` and set, for the chosen release:
 - Release level: `spotifyId` (the album ID), `spotifyUrl` (the album URL), and `youtubeUrl` / `youtubePlaylistUrl`
 - **Track level, every track: `spotifyId` and `spotifyUrl` (the track URL, not the album URL)**
 
-**The track-level `spotifyId` is the field that broke the Lickin release.** The card players on the homepage and the song page embed the *track*, not the album, so a missing track `spotifyId` means no player. The card has no artwork of its own — the Spotify iframe *is* the visible body of the card — so a broken embed makes the release look like it never got added at all. Step 6b exists to catch this; don't rely on it.
+**The track-level `spotifyId` is the field that broke the Lickin release.** Until a release has local clips, the card players on the homepage and the song page embed the *track*, not the album, so a missing track `spotifyId` means no player. The card has no artwork of its own — the player *is* the visible body of the card — so a broken embed makes the release look like it never got added at all. Step 6b exists to catch this; don't rely on it.
 
 Leave `amazonMusicUrl` as `null` unless the user volunteers it.
 
@@ -134,13 +134,25 @@ Show the user the newly generated clips from `clips.yaml` for this song. Ask if 
 
 ---
 
+## Step 6a — Add the preview clips
+
+Ask for the path to the master and where the clip should start. Run this once per track, using the release's slug as the folder (for an EP, the `-ep` page's slug for every track):
+```bash
+node scripts/encode-media.mjs <slug> <track-number> <master> --start 1:05
+```
+It writes `src/assets/media/<slug>/<NN>.mp3` and, on first run, `cover.jpg` from the release artwork (pass `--cover <file>` to use a different image). Masters stay out of the repo.
+
+A release uses the local player only once **every** track has a clip; until then it stays on Spotify. If the user has no master to hand, skip this step — the Spotify fallback is fine.
+
+---
+
 ## Step 6b — Verify the release renders
 
-Run `npm run build`, then confirm the new release's embed points at a *track* ID and not an album ID:
+Run `npm run build`. If the release has clips, the build fails on a misnamed or stray file. If it's on the Spotify fallback, confirm the embed points at a *track* ID and not an album ID:
 ```bash
 grep -o "open.spotify.com/embed/[a-z]*/[A-Za-z0-9]*" dist/index.html | sort -u
 ```
-Singles must appear as `embed/track/...`; only EPs/albums should appear as `embed/album/...`. Then start the dev server and take a screenshot of the release card — confirm the player shows artwork and a Preview button rather than an empty box.
+Singles must appear as `embed/track/...`; only EPs/albums should appear as `embed/album/...`. Then start the dev server and take a screenshot of the release card — confirm the local player shows the cover and a Play button, or the Spotify player shows artwork and a Preview button, rather than an empty box.
 
 ---
 

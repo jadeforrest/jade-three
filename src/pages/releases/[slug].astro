@@ -3,8 +3,9 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import SpotifyEmbed from '../../components/SpotifyEmbed.astro';
+import ReleasePlayer from '../../components/ReleasePlayer.astro';
 import PlatformLinks from '../../components/PlatformLinks.astro';
+import { getCoverUrl, getReleasePlayer } from '../../lib/media';
 import releasesData from '../../data/releases.json';
 import type { ReleasesData } from '../../types/releases';
 
@@ -32,11 +33,8 @@ const formattedDate = releaseDate.toLocaleDateString('en-US', {
 });
 
 const typeLabel = release.type === 'ep' ? 'EP' : release.type === 'album' ? 'Album' : 'Single';
-const embedId = release.type === 'single'
-  ? (release.tracks[0]?.spotifyId ?? release.spotifyId)
-  : release.spotifyId;
-const embedType = release.type === 'single' ? 'track' : 'album';
-const embedHeight = release.type === 'single' ? 152 : 352;
+const player = getReleasePlayer(release);
+const artworkUrl = player.kind === 'local' ? await getCoverUrl(player.cover, 600) : release.artworkUrl;
 ---
 <BaseLayout
   title={`${release.title} — Jade Three`}
@@ -51,7 +49,7 @@ const embedHeight = release.type === 'single' ? 152 : 352;
     <!-- Blurred artwork backdrop -->
     <div
       class="absolute inset-0 bg-cover bg-center scale-110 blur-3xl opacity-20"
-      style={`background-image: url('${release.artworkUrl}')`}
+      style={`background-image: url('${artworkUrl}')`}
       aria-hidden="true"
     ></div>
     <div class="absolute inset-0 bg-gradient-to-b from-base/50 via-base/70 to-base" aria-hidden="true"></div>
@@ -59,7 +57,7 @@ const embedHeight = release.type === 'single' ? 152 : 352;
     <div class="relative max-w-4xl mx-auto px-6 pt-12 pb-16 flex flex-col sm:flex-row gap-8 items-end">
       <!-- Artwork -->
       <img
-        src={release.artworkUrl}
+        src={artworkUrl}
         alt={`${release.title} artwork`}
         width="192"
         height="192"
@@ -94,9 +92,9 @@ const embedHeight = release.type === 'single' ? 152 : 352;
       ← All releases
     </a>
 
-    <!-- Embed -->
+    <!-- Player -->
     <div class="mb-14">
-      <SpotifyEmbed spotifyId={embedId} type={embedType} height={embedHeight} />
+      <ReleasePlayer release={release} />
     </div>
 
     <!-- Song notes -->

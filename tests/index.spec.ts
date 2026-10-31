@@ -48,14 +48,14 @@ test.describe('Jade Three homepage', () => {
     expect(await cards.count()).toBeGreaterThanOrEqual(1);
   });
 
-  test('EP/album releases render with title and Spotify embed', async ({ page }) => {
+  test('EP/album releases render with title and a player', async ({ page }) => {
     await page.goto('/');
     // AlbumCard renders the release title and an "EP" or "Album" label
     const albumCard = page.locator('#releases article').filter({ hasText: /\bEP\b|\bAlbum\b/ });
     await expect(albumCard.first()).toBeVisible();
-    // The card includes a Spotify album embed
-    const embed = albumCard.first().locator('iframe[src*="open.spotify.com/embed/album"]');
-    await expect(embed).toBeVisible();
+    // The card has the local player, or a Spotify album embed as the fallback
+    const player = albumCard.first().locator('[data-player], iframe[src*="open.spotify.com/embed/album"]');
+    await expect(player).toBeVisible();
   });
 
   test('each release card has a Spotify link', async ({ page }) => {
@@ -64,14 +64,15 @@ test.describe('Jade Three homepage', () => {
     await expect(spotifyLinks.first()).toBeVisible();
   });
 
-  test('Spotify embed or placeholder is present for each release', async ({ page }) => {
+  test('every release card has exactly one player', async ({ page }) => {
     await page.goto('/');
-    // With real Spotify IDs an iframe renders; with placeholder data a fallback div renders.
-    const embeds = page.locator('iframe[src*="open.spotify.com/embed"]');
-    const placeholders = page.locator('#releases [style*="height"] >> text=Player unavailable');
-    const embedCount = await embeds.count();
-    const placeholderCount = await placeholders.count();
-    expect(embedCount + placeholderCount).toBeGreaterThan(0);
+    const cards = await page.locator('#releases article').all();
+    expect(cards.length).toBeGreaterThan(0);
+    for (const card of cards) {
+      // Local player, Spotify embed, or the "Player unavailable" placeholder.
+      const players = card.locator('[data-player], iframe[src*="open.spotify.com/embed"], [style*="height"]');
+      await expect(players).toHaveCount(1);
+    }
   });
 
   test('renders the footer', async ({ page }) => {
