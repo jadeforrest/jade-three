@@ -39,7 +39,7 @@ test('property: m:ss parses to the seconds it was formatted from', () => {
 
 test('parseArgs applies defaults', () => {
   assert.deepEqual(parseArgs(['stinger', '1', 'm.wav']), {
-    slug: 'stinger', track: 1, master: 'm.wav', start: 0, length: 30, cover: null,
+    slug: 'stinger', track: 1, master: 'm.wav', start: 0, length: 30, cover: null, stamp: 'gold',
   });
 });
 
@@ -48,6 +48,7 @@ test('parseArgs reads flags', () => {
   assert.equal(options.start, 65);
   assert.equal(options.length, 20);
   assert.equal(options.cover, 'a.png');
+  assert.equal(parseArgs(['ep', '2', 'm.wav', '--stamp', 'dark']).stamp, 'dark');
 });
 
 test('parseArgs rejects bad input', () => {

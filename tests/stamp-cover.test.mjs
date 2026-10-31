@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fc from 'fast-check';
-import { stampArgs, stampCover, stampLayout } from '../scripts/stamp-cover.mjs';
+import { stampArgs, stampCover, stampFile, stampLayout } from '../scripts/stamp-cover.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const STAMP = join(REPO, 'brand/jade-three-e-gold.png');
@@ -44,6 +44,19 @@ test('stampArgs places the stamp lower left and strips metadata', () => {
   ]);
 });
 
+test('stampFile picks the brand file and rejects anything else', () => {
+  assert.equal(stampFile('gold'), STAMP);
+  assert.equal(stampFile('dark'), join(REPO, 'brand/jade-three-e-dark.png'));
+  for (const name of ['light', 'toString', undefined]) {
+    assert.throws(() => stampFile(name), /Unknown stamp/);
+  }
+});
+
+test('stampArgs uses the requested stamp', () => {
+  const args = stampArgs('in.png', 'out.jpg', 3000, 'dark');
+  assert.equal(args[args.lastIndexOf('-i') + 1], join(REPO, 'brand/jade-three-e-dark.png'));
+});
+
 /** Average color of a region, as [r, g, b]. */
 function regionColor(file, x, y, size) {
   const raw = execFileSync('ffmpeg', [
@@ -67,6 +80,18 @@ test('stampCover draws gold in the lower left only', () => {
   assert.ok(r > 180 && g > 150 && b < 170, `expected gold, got ${[r, g, b]}`);
   assert.deepEqual(regionColor(output, 1300, 1300, 8).map((v) => v < 20), [true, true, true]);
   assert.deepEqual(regionColor(output, 60, 60, 8).map((v) => v < 20), [true, true, true]);
+});
+
+test('the dark stamp draws near-black on light artwork', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'stamp-cover-test-'));
+  const art = join(dir, 'art.png');
+  const output = join(dir, 'cover.jpg');
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'lavfi', '-i', 'color=c=white:s=2000x2000', '-frames:v', '1', art]);
+
+  stampCover(art, output, 'dark');
+
+  assert.ok(regionColor(output, 60, 1400 - 56 - 98 + 2, 8).every((v) => v < 40));
+  assert.ok(regionColor(output, 1300, 1300, 8).every((v) => v > 235));
 });
 
 test('the CLI explains its usage', () => {

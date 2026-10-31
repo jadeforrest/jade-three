@@ -5,13 +5,14 @@
  * along with cover.jpg. Masters stay out of the repo.
  *
  * Usage:
- *   node scripts/encode-media.mjs <slug> <track> <master> [--start 1:05] [--length 30] [--cover art.png]
+ *   node scripts/encode-media.mjs <slug> <track> <master> [--start 1:05] [--length 30] [--cover art.png] [--stamp dark]
  *
  * <slug> is any song page for the release, used as the folder name. For an EP,
  * use the same slug for every track (e.g. year-until-the-fall-ep).
  *
  * Without --cover, an existing cover.jpg is kept; otherwise the release artwork
- * is downloaded from Apple. Covers get the logo stamp. Requires ffmpeg.
+ * is downloaded from Apple. Covers get the logo stamp, gold unless
+ * --stamp dark is passed. Requires ffmpeg.
  */
 
 import { execFileSync } from 'child_process';
@@ -34,17 +35,18 @@ export function parseTime(value) {
 export function parseArgs(argv) {
   const [slug, track, master, ...flags] = argv;
   if (!slug || !master || !/^[a-z0-9-]+$/.test(slug)) {
-    throw new Error('Usage: encode-media.mjs <slug> <track> <master> [--start 1:05] [--length 30] [--cover art.png]');
+    throw new Error('Usage: encode-media.mjs <slug> <track> <master> [--start 1:05] [--length 30] [--cover art.png] [--stamp dark]');
   }
   if (!/^[1-9]\d?$/.test(track)) throw new Error(`Invalid track number: ${track}`);
 
-  const options = { slug, track: Number(track), master, start: 0, length: 30, cover: null };
+  const options = { slug, track: Number(track), master, start: 0, length: 30, cover: null, stamp: 'gold' };
   for (let i = 0; i < flags.length; i += 2) {
     const [flag, value] = [flags[i], flags[i + 1]];
     if (value === undefined) throw new Error(`Missing value for ${flag}`);
     if (flag === '--start') options.start = parseTime(value);
     else if (flag === '--length') options.length = parseTime(value);
     else if (flag === '--cover') options.cover = value;
+    else if (flag === '--stamp') options.stamp = value;
     else throw new Error(`Unknown option: ${flag}`);
   }
   if (options.length <= FADE_OUT_SECONDS) {
@@ -84,7 +86,7 @@ function findRelease(slug, root) {
   return release;
 }
 
-async function downloadArtwork(release, output) {
+async function downloadArtwork(release, output, stamp) {
   const url = release.artworkUrl.replace('600x600bb', '3000x3000bb');
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Artwork download failed: ${res.status} ${url}`);
@@ -92,17 +94,17 @@ async function downloadArtwork(release, output) {
   try {
     const download = join(tmp, 'artwork.jpg');
     writeFileSync(download, Buffer.from(await res.arrayBuffer()));
-    stampCover(download, output);
+    stampCover(download, output, stamp);
   } finally {
     rmSync(tmp, { recursive: true });
   }
 }
 
-async function writeCover(coverSource, release, output) {
+async function writeCover(coverSource, release, output, stamp) {
   if (coverSource) {
-    stampCover(coverSource, output);
+    stampCover(coverSource, output, stamp);
   } else if (!existsSync(output)) {
-    await downloadArtwork(release, output);
+    await downloadArtwork(release, output, stamp);
   }
   console.log(`Cover: ${output}`);
 }
@@ -121,7 +123,7 @@ export async function encode(argv, root = ROOT) {
   ffmpeg(clipArgs(options, clip));
   console.log(`Wrote ${clip}`);
 
-  await writeCover(options.cover, release, join(folder, 'cover.jpg'));
+  await writeCover(options.cover, release, join(folder, 'cover.jpg'), options.stamp);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

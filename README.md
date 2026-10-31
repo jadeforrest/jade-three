@@ -17,10 +17,10 @@ src/assets/media/<slug>/01.mp3
 node scripts/encode-media.mjs <slug> <track> <master> --start 1:05
 ```
 
-Covers get the gold E from `brand/jade-three-e-gold.png` stamped in the lower left. To stamp artwork on its own:
+Covers get the gold E from `brand/jade-three-e-gold.png` stamped in the lower left. Pass `--stamp dark` to use `brand/jade-three-e-dark.png` on light artwork. To stamp artwork on its own:
 
 ```bash
-node scripts/stamp-cover.mjs <artwork> <output.jpg>
+node scripts/stamp-cover.mjs <artwork> <output.jpg> [--stamp dark]
 ```
 
 Masters stay out of the repo. Misnamed files and folders with no song page fail the build.
