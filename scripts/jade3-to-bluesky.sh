@@ -25,8 +25,11 @@ set +eu
 source .env
 set -eu
 
+# Arguments (e.g. --dry-run) pass through to node; a manual run with
+# arguments is not the schedule's success, so it writes no heartbeat.
+if [ $# -gt 0 ]; then JOB_NO_HEARTBEAT=1; fi
 code=0
-node "scripts/post-clip.mjs" >> "$JOB_LOG_FILE" 2>&1 || code=$?
+node "scripts/post-clip.mjs" "$@" >> "$JOB_LOG_FILE" 2>&1 || code=$?
 if (( code != 0 )); then
     JOB_FAIL_REASON="post-clip.mjs failed (exit $code)"
 fi
