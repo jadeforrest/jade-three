@@ -221,7 +221,7 @@
   url: https://jadethreemusic.com/releases/coordination-problem
   clips:
     - approved: true
-      sent: false
+      sent: true
       text: |
         Jade Three named "Coordination Problem" to reflect anxiety in the world — then made music that sounds nothing like anxiety. The contrast is the whole vibe.
 
@@ -810,7 +810,7 @@
         https://jadethreemusic.com/releases/obey-early
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         Pretty and delicate. Shifting textures. Layered drums. Acid and synth sounds moving things around. Jade Three's "Obey Early" is all of that at once.
 
@@ -1193,7 +1193,7 @@
         https://jadethreemusic.com/releases/fall-in-love
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         The lyrics came after the fact. I found vocal clips I liked the sound of, and once they came in, they completely reoriented the song. It sounded a lot different before that.
 
@@ -1540,7 +1540,7 @@
         https://jadethreemusic.com/releases/lickin
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         He didn't write the lyrics. He didn't originally choose the story. But Jade Three let the music speak — and what came out of it went deeper than he expected. What does this one make you feel?
 
@@ -1601,7 +1601,7 @@
         https://jadethreemusic.com/releases/la-mitica
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         I'm embarrassed to say I didn't even know what the lyrics meant at first. I had to look them up — and when I did, it altered where I wanted to position everything. But that freedom at the start was real too.
 
@@ -1657,7 +1657,7 @@
         https://jadethreemusic.com/releases/la-mitica
 
     - approved: true
-      sent: false
+      sent: true
       text: |
         Jade Three says the vocal rhythm, drums, and synth bass are the whole skeleton of "La Mítica." Everything else just hangs off that foundation. Pure groove from the ground up.
 
