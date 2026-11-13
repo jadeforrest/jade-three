@@ -8,3 +8,4 @@ test-results/
 playwright-report/
 .claude/worktrees/
 *~
+scripts/j3-release-day-rebuild.state

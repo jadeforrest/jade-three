@@ -6,8 +6,10 @@
  *   node scripts/post-clip.mjs                     # post a random approved clip from any song
  *   node scripts/post-clip.mjs --slug <slug>        # post a random approved clip from one song
  *   node scripts/post-clip.mjs --dry-run            # preview without posting
+ *   node scripts/post-clip.mjs --today 2026-12-01   # pretend it's another day (for testing)
  *
  * When multiple eligible clips exist (across all songs or within a slug), one is chosen at random.
+ * Clips for releases whose date hasn't arrived are skipped, since their pages aren't live yet.
  *
  * Required env vars:
  *   BLUESKY_HANDLE        your handle, e.g. jadethree.bsky.social
@@ -18,6 +20,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
+import { siteToday, unreleasedIds } from '../src/lib/release-dates.js';
 
 // Load .env if present
 const __envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env');
@@ -31,22 +34,40 @@ if (fs.existsSync(__envPath)) {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const CLIPS_FILE = path.join(ROOT, 'clips.yaml');
+const RELEASES_FILE = path.join(ROOT, 'src', 'data', 'releases.json');
+const SONGS_DIR = path.join(ROOT, 'src', 'content', 'songs');
 const BSKY_API = 'https://bsky.social/xrpc';
 
 const DRY_RUN = process.argv.includes('--dry-run') || process.argv.includes('-n');
 const SLUG_IDX = process.argv.indexOf('--slug');
 const SLUG_FILTER = SLUG_IDX !== -1 ? process.argv[SLUG_IDX + 1] : null;
+const TODAY_IDX = process.argv.indexOf('--today');
+const TODAY = TODAY_IDX !== -1 ? process.argv[TODAY_IDX + 1] : siteToday();
 const BSKY_HEADERS = { 'User-Agent': 'jade-three-bot/1.0' };
 
 // ── Clip loading ──────────────────────────────────────────────────────────────
 
+/** Song slugs whose release date hasn't arrived, so their links would 404. */
+function unreleasedSlugs() {
+  const { releases } = JSON.parse(fs.readFileSync(RELEASES_FILE, 'utf-8'));
+  const hidden = unreleasedIds(releases, TODAY);
+  const slugs = new Set();
+  for (const file of fs.readdirSync(SONGS_DIR)) {
+    const frontmatter = yaml.load(fs.readFileSync(path.join(SONGS_DIR, file), 'utf-8').split('---')[1]);
+    if (hidden.has(frontmatter.releaseId)) slugs.add(path.basename(file, '.md'));
+  }
+  return slugs;
+}
+
 function loadEligibleClips() {
   const raw = fs.readFileSync(CLIPS_FILE, 'utf-8');
   const songs = yaml.load(raw);
+  const unreleased = unreleasedSlugs();
 
   const eligible = [];
   for (const song of songs) {
     if (SLUG_FILTER && song.slug !== SLUG_FILTER) continue;
+    if (unreleased.has(song.slug)) continue;
     for (const clip of song.clips ?? []) {
       if (clip.approved === true && clip.sent === false) {
         eligible.push({ slug: song.slug, text: clip.text.trim() });

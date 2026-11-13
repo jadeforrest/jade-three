@@ -60,6 +60,12 @@ Run the `/new-release` skill in Claude Code. It walks through the full workflow:
 
 To start: open Claude Code in this directory and type `/new-release`.
 
+### Upcoming releases
+
+A release whose `releaseDate` in `releases.json` is in the future (Portland time) is left out of the build: no homepage card, no song page, no sitemap entry, and `post-clip.mjs` skips its clips. `npm run dev` still shows it for previewing. The site is static, so the page appears with the first build on or after the release date.
+
+A launchd job (`scripts/com.jade.j3-release-day-rebuild.plist`, daily at 12:05 AM) runs `scripts/j3-release-day-rebuild.mjs`, which POSTs to the Netlify build hook in `NETLIFY_BUILD_HOOK` (in `.env`) when a release has gone live since its last run. Push the release to `main` before its date, since that's what Netlify builds. The job fails, and notifies, if a release is upcoming and the hook isn't set.
+
 ### Updating release data only
 
 To pull the latest iTunes data without going through the full workflow:

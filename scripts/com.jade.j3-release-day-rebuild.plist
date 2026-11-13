@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>HOME</key>
+		<string>/Users/jade</string>
+		<key>PATH</key>
+		<string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+	<key>Label</key>
+	<string>com.jade.j3-release-day-rebuild</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/jade/Developer/jade-three/scripts/j3-release-day-rebuild.sh</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/Users/jade/Developer/jade-three/scripts/j3-release-day-rebuild.launchd.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/jade/Developer/jade-three/scripts/j3-release-day-rebuild.launchd.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>0</integer>
+		<key>Minute</key>
+		<integer>5</integer>
+	</dict>
+</dict>
+</plist>

@@ -8,10 +8,13 @@ import PlatformLinks from '../../components/PlatformLinks.astro';
 import { getCoverUrl, getReleasePlayer } from '../../lib/media';
 import releasesData from '../../data/releases.json';
 import type { ReleasesData } from '../../types/releases';
+import { hiddenReleaseIds } from '../../lib/hidden-releases';
 
 export async function getStaticPaths() {
   const songs = await getCollection('songs');
-  return songs.map((song) => ({
+  // Upcoming releases get no page (and so no sitemap entry) until a build runs
+  // on their release date.
+  return songs.filter((song) => !hiddenReleaseIds.has(song.data.releaseId)).map((song) => ({
     params: { slug: song.id },
     props: { song },
   }));

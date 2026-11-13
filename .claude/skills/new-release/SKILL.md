@@ -14,6 +14,8 @@ Run `node scripts/fetch-releases.js` to pull the latest data from iTunes into `s
 
 Read `src/data/releases.json`. Then list all `releaseId` values from the frontmatter of every file in `src/content/songs/`. Find which releases in `releases.json` have no corresponding song page. Present these to the user and confirm which one to process (if there's only one obvious new one, confirm it rather than asking).
 
+**Upcoming releases.** If the release isn't out yet, iTunes usually doesn't list it. Add its entry to `releases.json` by hand (same shape as the others, with `id` like `single-<anything unique>`, the future `releaseDate`, and the artwork URLs left empty until iTunes has them). The site hides it until its `releaseDate` arrives in Portland, `fetch-releases.js` keeps it until iTunes lists it, and `post-clip.mjs` won't post its clips early. `npm run dev` shows it, so it can be previewed. Because the site is static, the page only goes live when a build runs on or after that date.
+
 ---
 
 ## Step 3 — Collect missing platform URLs

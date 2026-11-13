@@ -13,8 +13,9 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
+import { isReleased, siteToday } from '../src/lib/release-dates.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -118,6 +119,15 @@ function findExistingRelease(existing, collectionName) {
   return existing.releases?.find(r => normalizeTitle(r.title) === norm) ?? null;
 }
 
+/**
+ * An upcoming release is added to releases.json by hand before iTunes lists
+ * it. Keep those, so a sync before release day doesn't delete them.
+ */
+export function keepUnlistedUpcoming(fetched, existing, today) {
+  const listed = new Set(fetched.map(r => normalizeTitle(r.title)));
+  return existing.filter(r => !isReleased(r.releaseDate, today) && !listed.has(normalizeTitle(r.title)));
+}
+
 function findExistingTrack(existingRelease, trackName) {
   const norm = normalizeTitle(trackName);
   return existingRelease?.tracks?.find(t => normalizeTitle(t.title) === norm) ?? null;
@@ -192,6 +202,8 @@ async function main() {
     console.log(' done');
   }
 
+  releases.push(...keepUnlistedUpcoming(releases, existing.releases ?? [], siteToday()));
+
   // Sort newest first
   releases.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
 
@@ -208,7 +220,9 @@ async function main() {
   console.log('  • git add src/data/releases.json && git commit -m "update releases"');
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
+}

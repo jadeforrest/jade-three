@@ -7,8 +7,10 @@ import HeroSection from '../components/HeroSection.astro';
 import ReleasesGrid from '../components/ReleasesGrid.astro';
 import releasesData from '../data/releases.json';
 import type { ReleasesData } from '../types/releases';
+import { hiddenReleaseIds } from '../lib/hidden-releases';
 
 const data = releasesData as ReleasesData;
+const releases = data.releases.filter((r) => !hiddenReleaseIds.has(r.id));
 const songs = await getCollection('songs');
 const slugMap = Object.fromEntries(songs.map((s) => [s.data.releaseId, s.id]));
 ---
@@ -22,7 +24,7 @@ const slugMap = Object.fromEntries(songs.map((s) => [s.data.releaseId, s.id]));
     <HeroSection artistName={data.artistName} />
 
     <section id="releases" class="max-w-5xl mx-auto px-6 py-16">
-      <ReleasesGrid releases={data.releases} slugMap={slugMap} />
+      <ReleasesGrid releases={releases} slugMap={slugMap} />
     </section>
   </main>
 
