@@ -20,8 +20,10 @@ node scripts/encode-media.mjs <slug> <track> <master> --start 1:05
 Covers get the gold E from `brand/jade-three-e-gold.png` stamped in the lower left. Pass `--stamp dark` to use `brand/jade-three-e-dark.png` on light artwork. To stamp artwork on its own:
 
 ```bash
-node scripts/stamp-cover.mjs <artwork> <output.jpg> [--stamp dark]
+node scripts/stamp-cover.mjs <artwork> <output.jpg> (--site | --distribution) [--stamp dark]
 ```
+
+Say which the cover is for. `--site` caps it at 1400 px wide. `--distribution` keeps the artwork's own size (scaled down only past 6000 px) and fails unless it's square and at least 1500 px.
 
 Masters stay out of the repo. Misnamed files and folders with no song page fail the build.
 

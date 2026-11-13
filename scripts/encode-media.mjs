@@ -94,7 +94,7 @@ async function downloadArtwork(release, output, stamp) {
   try {
     const download = join(tmp, 'artwork.jpg');
     writeFileSync(download, Buffer.from(await res.arrayBuffer()));
-    stampCover(download, output, stamp);
+    stampCover(download, output, { target: 'site', stamp });
   } finally {
     rmSync(tmp, { recursive: true });
   }
@@ -102,7 +102,7 @@ async function downloadArtwork(release, output, stamp) {
 
 async function writeCover(coverSource, release, output, stamp) {
   if (coverSource) {
-    stampCover(coverSource, output, stamp);
+    stampCover(coverSource, output, { target: 'site', stamp });
   } else if (!existsSync(output)) {
     await downloadArtwork(release, output, stamp);
   }
