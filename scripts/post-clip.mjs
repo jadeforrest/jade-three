@@ -18,9 +18,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import yaml from 'js-yaml';
 import { siteToday, unreleasedIds } from '../src/lib/release-dates.js';
+import { fetchWithRetry, describeFetchError } from './lib/fetch-retry.mjs';
 
 // Load .env if present
 const __envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env');
@@ -103,8 +104,8 @@ function markSent(clipText) {
 // ── Bluesky ───────────────────────────────────────────────────────────────────
 
 // Fetch OG title/description/image from a URL
-async function fetchOgData(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'Bluesky/cardyb' } });
+async function fetchOgData(url, retryOpts) {
+  const res = await fetchWithRetry(url, { headers: { 'User-Agent': 'Bluesky/cardyb' } }, retryOpts);
   const html = await res.text();
   const get = (prop) =>
     html.match(new RegExp(`<meta[^>]+property="${prop}"[^>]+content="([^"]+)"`))?.[1] ??
@@ -135,13 +136,15 @@ async function uploadThumb(imageUrl, accessJwt, pdsApi) {
   }
 }
 
-async function bskyPost(handle, password, text) {
-  // 1. Authenticate
-  const authRes = await fetch(`${BSKY_API}/com.atproto.server.createSession`, {
+// retryOpts is passed to fetchWithRetry (tests use it to skip the real pauses).
+export async function bskyPost(handle, password, text, retryOpts) {
+  // 1. Authenticate. Retried on network errors: this is the first request after
+  // a wake from sleep, and creating a session is safe to repeat.
+  const authRes = await fetchWithRetry(`${BSKY_API}/com.atproto.server.createSession`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...BSKY_HEADERS },
     body: JSON.stringify({ identifier: handle, password }),
-  });
+  }, retryOpts);
   if (!authRes.ok) {
     const err = await authRes.text();
     throw new Error(`Bluesky auth failed: ${err}`);
@@ -160,7 +163,7 @@ async function bskyPost(handle, password, text) {
   // 3. Build link card embed from the release page's OG tags
   const postUrl = text.split('\n').filter(Boolean).at(-1).trim();
   process.stderr.write(`Fetching OG data for: ${postUrl}\n`);
-  const og = await fetchOgData(postUrl);
+  const og = await fetchOgData(postUrl, retryOpts);
   const thumb = og.imageUrl ? await uploadThumb(og.imageUrl, accessJwt, pdsApi) : null;
   if (!thumb) process.stderr.write('  (no thumbnail — image unavailable)\n');
 
@@ -174,7 +177,8 @@ async function bskyPost(handle, password, text) {
     },
   };
 
-  // 4. Create the post
+  // 4. Create the post. Deliberately not retried: if the connection drops after
+  // the PDS accepted it, a retry would post the clip twice.
   const postRes = await fetch(`${pdsApi}/com.atproto.repo.createRecord`, {
     method: 'POST',
     headers: {
@@ -256,7 +260,10 @@ async function main() {
   console.log('clips.yaml updated: marked as sent.');
 }
 
-main().catch(err => {
-  console.error(err.message);
-  process.exit(1);
-});
+// Run only as a script, so tests can import bskyPost without posting.
+if (process.argv[1] && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
+  main().catch(err => {
+    console.error(describeFetchError(err));
+    process.exit(1);
+  });
+}
