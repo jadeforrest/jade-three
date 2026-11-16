@@ -128,6 +128,30 @@ export function keepUnlistedUpcoming(fetched, existing, today) {
   return existing.filter(r => !isReleased(r.releaseDate, today) && !listed.has(normalizeTitle(r.title)));
 }
 
+/** The Apple album id at the end of an Apple Music album URL. */
+function appleAlbumId(url) {
+  return url?.match(/\/(\d+)(?:\?|$)/)?.[1] ?? null;
+}
+
+/**
+ * iTunes can list two albums that map to the same site id (e.g. a re-issue
+ * whose title differs only in capitalization). Keep one release per id: the
+ * one whose Apple album matches the existing entry, else the first seen.
+ */
+export function dedupeReleases(releases, existing, warn = console.warn) {
+  const existingAlbum = new Map(existing.map(r => [r.id, appleAlbumId(r.appleMusicUrl)]));
+  const isExisting = r => appleAlbumId(r.appleMusicUrl) === existingAlbum.get(r.id);
+  const kept = new Map();
+  for (const r of [...releases.filter(isExisting), ...releases.filter(r => !isExisting(r))]) {
+    if (kept.has(r.id)) {
+      warn(`Warning: skipping duplicate of "${r.id}" from ${r.appleMusicUrl}`);
+    } else {
+      kept.set(r.id, r);
+    }
+  }
+  return releases.filter(r => kept.get(r.id) === r);
+}
+
 function findExistingTrack(existingRelease, trackName) {
   const norm = normalizeTitle(trackName);
   return existingRelease?.tracks?.find(t => normalizeTitle(t.title) === norm) ?? null;
@@ -146,7 +170,7 @@ async function main() {
   console.log(`Found ${albums.length} releases. Fetching track data...`);
 
   const existing = loadExisting();
-  const releases = [];
+  let releases = [];
 
   for (const album of albums) {
     process.stdout.write(`  Processing "${album.collectionName}"...`);
@@ -202,6 +226,7 @@ async function main() {
     console.log(' done');
   }
 
+  releases = dedupeReleases(releases, existing.releases ?? []);
   releases.push(...keepUnlistedUpcoming(releases, existing.releases ?? [], siteToday()));
 
   // Sort newest first
