@@ -157,6 +157,49 @@ function findExistingTrack(existingRelease, trackName) {
   return existingRelease?.tracks?.find(t => normalizeTitle(t.title) === norm) ?? null;
 }
 
+/** One track entry: iTunes data, with hand-filled links kept from the existing track. */
+export function buildTrack(track, existingTrack) {
+  const durationMs = track.trackTimeMillis ?? existingTrack?.durationMs ?? 0;
+  return {
+    trackNumber: track.trackNumber,
+    title: existingTrack?.title ?? track.trackName,
+    spotifyId: existingTrack?.spotifyId ?? null,
+    spotifyUrl: existingTrack?.spotifyUrl ?? null,
+    appleMusicUrl: track.trackViewUrl ?? existingTrack?.appleMusicUrl ?? null,
+    amazonMusicUrl: existingTrack?.amazonMusicUrl ?? null,
+    youtubeUrl: existingTrack?.youtubeUrl ?? null,
+    durationMs,
+    durationFormatted: formatDuration(durationMs),
+    isExplicit: track.trackExplicitness === 'explicit',
+  };
+}
+
+/**
+ * One release entry for an iTunes album. The existing entry's id, type, title
+ * and hand-filled links win; iTunes supplies dates, artwork and tracks.
+ */
+export function buildRelease(album, trackItems, existingRelease) {
+  const trackCount = trackItems.length || album.trackCount;
+  const type = existingRelease?.type ?? inferType(album.collectionName, trackCount);
+  return {
+    id: existingRelease?.id ?? `${type}-${album.collectionId}`,
+    type,
+    title: existingRelease?.title ?? cleanTitle(album.collectionName),
+    releaseDate: album.releaseDate?.slice(0, 10) ?? existingRelease?.releaseDate ?? '',
+    year: parseInt(album.releaseDate?.slice(0, 4) ?? existingRelease?.year ?? '0', 10),
+    spotifyId: existingRelease?.spotifyId ?? null,
+    spotifyUrl: existingRelease?.spotifyUrl ?? null,
+    appleMusicUrl: album.collectionViewUrl ?? existingRelease?.appleMusicUrl ?? null,
+    amazonMusicUrl: existingRelease?.amazonMusicUrl ?? null,
+    youtubePlaylistUrl: existingRelease?.youtubePlaylistUrl ?? null,
+    youtubeUrl: existingRelease?.youtubeUrl ?? null,
+    artworkUrl: largeArtworkUrl(album.artworkUrl100),
+    artworkUrlSmall: smallArtworkUrl(album.artworkUrl100),
+    totalTracks: trackCount,
+    tracks: trackItems.map(track => buildTrack(track, findExistingTrack(existingRelease, track.trackName))),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -183,45 +226,7 @@ async function main() {
       console.warn(`\n    Warning: could not fetch tracks (${err.message}). Continuing without track list.`);
     }
 
-    const existingRelease = findExistingRelease(existing, album.collectionName);
-    const trackCount = trackItems.length || album.trackCount;
-    const type = existingRelease?.type ?? inferType(album.collectionName, trackCount);
-    const id = existingRelease?.id ?? `${type}-${album.collectionId}`;
-    const title = existingRelease?.title ?? cleanTitle(album.collectionName);
-
-    const tracks = trackItems.map(track => {
-      const existingTrack = findExistingTrack(existingRelease, track.trackName);
-      return {
-        trackNumber: track.trackNumber,
-        title: existingTrack?.title ?? track.trackName,
-        spotifyId: existingTrack?.spotifyId ?? null,
-        spotifyUrl: existingTrack?.spotifyUrl ?? null,
-        appleMusicUrl: track.trackViewUrl ?? existingTrack?.appleMusicUrl ?? null,
-        amazonMusicUrl: existingTrack?.amazonMusicUrl ?? null,
-        youtubeUrl: existingTrack?.youtubeUrl ?? null,
-        durationMs: track.trackTimeMillis ?? existingTrack?.durationMs ?? 0,
-        durationFormatted: formatDuration(track.trackTimeMillis ?? existingTrack?.durationMs ?? 0),
-        isExplicit: track.trackExplicitness === 'explicit',
-      };
-    });
-
-    releases.push({
-      id,
-      type,
-      title,
-      releaseDate: album.releaseDate?.slice(0, 10) ?? existingRelease?.releaseDate ?? '',
-      year: parseInt(album.releaseDate?.slice(0, 4) ?? existingRelease?.year ?? '0', 10),
-      spotifyId: existingRelease?.spotifyId ?? null,
-      spotifyUrl: existingRelease?.spotifyUrl ?? null,
-      appleMusicUrl: album.collectionViewUrl ?? existingRelease?.appleMusicUrl ?? null,
-      amazonMusicUrl: existingRelease?.amazonMusicUrl ?? null,
-      youtubePlaylistUrl: existingRelease?.youtubePlaylistUrl ?? null,
-      youtubeUrl: existingRelease?.youtubeUrl ?? null,
-      artworkUrl: largeArtworkUrl(album.artworkUrl100),
-      artworkUrlSmall: smallArtworkUrl(album.artworkUrl100),
-      totalTracks: trackCount,
-      tracks,
-    });
+    releases.push(buildRelease(album, trackItems, findExistingRelease(existing, album.collectionName)));
 
     console.log(' done');
   }
