@@ -5,7 +5,7 @@ import AmazonMusicIcon from './icons/AmazonMusicIcon.astro';
 import YouTubeIcon from './icons/YouTubeIcon.astro';
 
 interface Props {
-  spotifyUrl: string;
+  spotifyUrl: string | null;
   appleMusicUrl: string | null;
   amazonMusicUrl: string | null;
   youtubeUrl: string | null;
@@ -23,15 +23,17 @@ const {
 } = Astro.props;
 ---
 <div class:list={['flex items-center gap-3', className]}>
-  <a
-    href={spotifyUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    class="text-spotify hover:opacity-75 transition-opacity duration-200"
-    title="Listen on Spotify"
-  >
-    <SpotifyIcon size={size} />
-  </a>
+  {spotifyUrl && (
+    <a
+      href={spotifyUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-spotify hover:opacity-75 transition-opacity duration-200"
+      title="Listen on Spotify"
+    >
+      <SpotifyIcon size={size} />
+    </a>
+  )}
 
   {appleMusicUrl && (
     <a

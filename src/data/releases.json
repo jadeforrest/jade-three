@@ -1,7 +1,37 @@
 {
-  "lastUpdated": "2026-10-15",
+  "lastUpdated": "2026-11-16",
   "artistName": "Jade Three",
   "releases": [
+    {
+      "id": "single-unincorporated",
+      "type": "single",
+      "title": "Unincorporated",
+      "releaseDate": "2026-11-27",
+      "year": 2026,
+      "spotifyId": null,
+      "spotifyUrl": null,
+      "appleMusicUrl": null,
+      "amazonMusicUrl": null,
+      "youtubePlaylistUrl": null,
+      "youtubeUrl": null,
+      "artworkUrl": "",
+      "artworkUrlSmall": "",
+      "totalTracks": 1,
+      "tracks": [
+        {
+          "trackNumber": 1,
+          "title": "Unincorporated",
+          "spotifyId": null,
+          "spotifyUrl": null,
+          "appleMusicUrl": null,
+          "amazonMusicUrl": null,
+          "youtubeUrl": null,
+          "durationMs": null,
+          "durationFormatted": null,
+          "isExplicit": false
+        }
+      ]
+    },
     {
       "id": "single-6819319947",
       "type": "single",

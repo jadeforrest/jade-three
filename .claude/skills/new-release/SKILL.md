@@ -16,6 +16,10 @@ Read `src/data/releases.json`. Then list all `releaseId` values from the frontma
 
 **Upcoming releases.** If the release isn't out yet, iTunes usually doesn't list it. Add its entry to `releases.json` by hand (same shape as the others, with `id` like `single-<anything unique>`, the future `releaseDate`, and the artwork URLs left empty until iTunes has them). The site hides it until its `releaseDate` arrives in Portland, `fetch-releases.js` keeps it until iTunes lists it, and `post-clip.mjs` won't post its clips early. `npm run dev` shows it, so it can be previewed. Because the site is static, the page only goes live when a build runs on or after that date.
 
+For an upcoming release, two things change later in the session:
+- **Spotify won't resolve yet.** An unreleased album's oEmbed and page return 404, so its IDs can't be verified in Step 3. Leave every Spotify field `null` rather than writing an unchecked ID, and say plainly that they need filling in after the release date. `PlatformLinks` hides the Spotify icon while the URL is null.
+- **The local clip is required, not optional.** With no Spotify ID and no iTunes artwork, Step 6a is the only thing that gives the card a player and a cover. So at the start of the session, ask for the master, the **unstamped** cover image (not a version with the E already on it), and the preview start time, alongside the Step 3 questions.
+
 ---
 
 ## Step 3 — Collect missing platform URLs
@@ -138,7 +142,11 @@ Show the user the newly generated clips from `clips.yaml` for this song. Ask if 
 
 ## Step 6a — Add the preview clips
 
-Ask for the path to the master and where the clip should start. Run this once per track, using the release's slug as the folder (for an EP, the `-ep` page's slug for every track):
+Ask for the path to the master and where the clip should start.
+
+**File access.** This app usually can't read `~/Music` (macOS returns "Operation not permitted", even outside the sandbox). Don't try first and fail. Hand the user one command to copy the master and cover into the session's scratchpad, written for zsh: `setopt nullglob extendedglob; cp "<folder>/"(#i)*.(aif|aiff|wav|jpg|jpeg|png|heic|tif|tiff) <scratchpad>/`. A brace list like `*.{aif,aiff}` aborts the whole copy when any pattern matches nothing. If the folder holds both a stereo AIF and an Atmos WAV, use the stereo AIF.
+
+If the only cover on hand is already stamped, don't pass it to `--cover`, since that stamps a second E. Ask for the unstamped original. Run this once per track, using the release's slug as the folder (for an EP, the `-ep` page's slug for every track):
 ```bash
 node scripts/encode-media.mjs <slug> <track-number> <master> --start 1:05
 ```
