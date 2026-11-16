@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fc from 'fast-check';
-import { buildRelease, buildTrack, dedupeReleases } from '../scripts/fetch-releases.js';
+import { buildRelease, buildTrack, dedupeReleases, syncReleases } from '../scripts/fetch-releases.js';
 
 const url = (album) => `https://music.apple.com/us/album/x/${album}?uo=4`;
 const quiet = () => {};
@@ -142,4 +142,79 @@ test('property: an existing entry\'s id, type, title and hand-filled links alway
       assert.equal(r.appleMusicUrl, url(collectionId), 'iTunes URL refreshes');
     }),
   );
+});
+
+// ---------------------------------------------------------------------------
+// syncReleases against a fake iTunes
+// ---------------------------------------------------------------------------
+
+const silent = { log: quiet, warn: quiet };
+const noPause = async () => {};
+
+/** A fake iTunes `get`: artist search, album lookup, and per-album tracks (an Error rejects). */
+function fakeItunes({ artists = [{ wrapperType: 'artist', artistName: 'Jade Three', artistId: 7 }], albums = [], tracks = {} }) {
+  return async (u) => {
+    const id = Number(new URL(u).searchParams.get('id'));
+    if (u.includes('/search')) return { results: artists };
+    if (u.includes('entity=album')) return { results: [{ wrapperType: 'artist' }, ...albums.map((a) => ({ wrapperType: 'collection', ...a }))] };
+    if (tracks[id] instanceof Error) throw tracks[id];
+    return { results: (tracks[id] ?? []).map((t) => ({ wrapperType: 'track', ...t })) };
+  };
+}
+
+test('syncReleases merges, dedupes, keeps upcoming hand-added releases, and sorts newest first', async () => {
+  const id = 'single-3vEU0S9UYRrS8YJAZOToMG';
+  const existing = [
+    { id, type: 'single', title: "Didn't you want something?", appleMusicUrl: url(1784829412), spotifyUrl: 'sp', releaseDate: '2024-12-06' },
+    { id: 'single-upcoming', title: 'Unincorporated', releaseDate: '2026-11-27' },
+    { id: 'single-gone', title: 'Old Unlisted', releaseDate: '2020-01-01' },
+  ];
+  const albums = [
+    album({ collectionId: 6823384523, collectionName: "Didn't You Want Something? - Single", collectionViewUrl: url(6823384523), releaseDate: '2024-12-06T08:00:00Z' }),
+    album({ collectionId: 1784829412, collectionName: "Didn't you want something? - Single", collectionViewUrl: url(1784829412), releaseDate: '2024-12-06T08:00:00Z' }),
+    album({ collectionId: 55, collectionName: 'Brand New', collectionViewUrl: url(55), releaseDate: '2026-02-01T08:00:00Z' }),
+  ];
+  const warnings = [];
+  const pauses = [];
+  const releases = await syncReleases({
+    get: fakeItunes({ albums, tracks: { 55: [itunesTrack({ trackName: 'Brand New' })] } }),
+    existing,
+    today: '2026-11-16',
+    pause: async (ms) => pauses.push(ms),
+    out: { log: quiet, warn: (m) => warnings.push(m) },
+  });
+
+  assert.deepEqual(releases.map((r) => r.id), ['single-upcoming', 'single-55', id]);
+  assert.equal(releases[2].appleMusicUrl, url(1784829412));
+  assert.equal(releases[2].spotifyUrl, 'sp');
+  assert.equal(releases[1].tracks[0].title, 'Brand New');
+  assert.equal(pauses.length, 3);
+  assert.equal(warnings.length, 1);
+});
+
+test('syncReleases keeps a release without tracks when its track lookup fails', async () => {
+  const warnings = [];
+  const releases = await syncReleases({
+    get: fakeItunes({ albums: [album({ trackCount: 3 })], tracks: { 42: new Error('503') } }),
+    existing: [],
+    today: '2026-11-16',
+    pause: noPause,
+    out: { log: quiet, warn: (m) => warnings.push(m) },
+  });
+  assert.equal(releases.length, 1);
+  assert.deepEqual(releases[0].tracks, []);
+  assert.equal(releases[0].totalTracks, 3);
+  assert.match(warnings[0], /could not fetch tracks \(503\)/);
+});
+
+test('syncReleases fails when iTunes has no artist named Jade Three', async () => {
+  await assert.rejects(
+    syncReleases({ get: fakeItunes({ artists: [{ wrapperType: 'artist', artistName: 'Jade Two' }] }), existing: [], today: '2026-11-16', pause: noPause, out: silent }),
+    /Artist "Jade Three" not found/,
+  );
+});
+
+test('syncReleases treats missing iTunes results as no albums', async () => {
+  const get = async (u) => (u.includes('/search') ? { results: [{ wrapperType: 'artist', artistName: 'jade three', artistId: 1 }] } : {});
+  assert.deepEqual(await syncReleases({ get, existing: [], today: '2026-11-16', pause: noPause, out: silent }), []);
 });

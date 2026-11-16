@@ -35,9 +35,9 @@ async function itunesGet(url) {
   return res.json();
 }
 
-async function getArtistId() {
+async function getArtistId(get) {
   const query = encodeURIComponent(ARTIST_NAME);
-  const data = await itunesGet(
+  const data = await get(
     `https://itunes.apple.com/search?term=${query}&media=music&entity=musicArtist&limit=10&country=US`
   );
   const artist = data.results?.find(
@@ -47,15 +47,15 @@ async function getArtistId() {
   return artist.artistId;
 }
 
-async function getArtistAlbums(artistId) {
-  const data = await itunesGet(
+async function getArtistAlbums(get, artistId) {
+  const data = await get(
     `https://itunes.apple.com/lookup?id=${artistId}&entity=album&limit=200&country=US`
   );
   return data.results?.filter(r => r.wrapperType === 'collection') ?? [];
 }
 
-async function getAlbumTracks(collectionId) {
-  const data = await itunesGet(
+async function getAlbumTracks(get, collectionId) {
+  const data = await get(
     `https://itunes.apple.com/lookup?id=${collectionId}&entity=song&country=US`
   );
   return data.results?.filter(r => r.wrapperType === 'track') ?? [];
@@ -108,15 +108,15 @@ function inferType(collectionName, trackCount) {
 // ---------------------------------------------------------------------------
 function loadExisting() {
   try {
-    return JSON.parse(readFileSync(OUTPUT_PATH, 'utf-8'));
+    return JSON.parse(readFileSync(OUTPUT_PATH, 'utf-8')).releases ?? [];
   } catch {
-    return { releases: [] };
+    return [];
   }
 }
 
 function findExistingRelease(existing, collectionName) {
   const norm = normalizeTitle(collectionName);
-  return existing.releases?.find(r => normalizeTitle(r.title) === norm) ?? null;
+  return existing.find(r => normalizeTitle(r.title) === norm) ?? null;
 }
 
 /**
@@ -157,17 +157,23 @@ function findExistingTrack(existingRelease, trackName) {
   return existingRelease?.tracks?.find(t => normalizeTitle(t.title) === norm) ?? null;
 }
 
+/** The first value that is neither null nor undefined, else the last one (a `??` chain). */
+const firstSet = (...values) => values.find(v => v !== undefined && v !== null) ?? values.at(-1);
+
+/** A hand-filled field from an existing entry, or null. */
+const handFilled = (existing, key) => firstSet(existing?.[key], null);
+
 /** One track entry: iTunes data, with hand-filled links kept from the existing track. */
 export function buildTrack(track, existingTrack) {
-  const durationMs = track.trackTimeMillis ?? existingTrack?.durationMs ?? 0;
+  const durationMs = firstSet(track.trackTimeMillis, existingTrack?.durationMs, 0);
   return {
     trackNumber: track.trackNumber,
-    title: existingTrack?.title ?? track.trackName,
-    spotifyId: existingTrack?.spotifyId ?? null,
-    spotifyUrl: existingTrack?.spotifyUrl ?? null,
-    appleMusicUrl: track.trackViewUrl ?? existingTrack?.appleMusicUrl ?? null,
-    amazonMusicUrl: existingTrack?.amazonMusicUrl ?? null,
-    youtubeUrl: existingTrack?.youtubeUrl ?? null,
+    title: firstSet(existingTrack?.title, track.trackName),
+    spotifyId: handFilled(existingTrack, 'spotifyId'),
+    spotifyUrl: handFilled(existingTrack, 'spotifyUrl'),
+    appleMusicUrl: firstSet(track.trackViewUrl, existingTrack?.appleMusicUrl, null),
+    amazonMusicUrl: handFilled(existingTrack, 'amazonMusicUrl'),
+    youtubeUrl: handFilled(existingTrack, 'youtubeUrl'),
     durationMs,
     durationFormatted: formatDuration(durationMs),
     isExplicit: track.trackExplicitness === 'explicit',
@@ -180,19 +186,19 @@ export function buildTrack(track, existingTrack) {
  */
 export function buildRelease(album, trackItems, existingRelease) {
   const trackCount = trackItems.length || album.trackCount;
-  const type = existingRelease?.type ?? inferType(album.collectionName, trackCount);
+  const type = firstSet(existingRelease?.type, inferType(album.collectionName, trackCount));
   return {
-    id: existingRelease?.id ?? `${type}-${album.collectionId}`,
+    id: firstSet(existingRelease?.id, `${type}-${album.collectionId}`),
     type,
-    title: existingRelease?.title ?? cleanTitle(album.collectionName),
-    releaseDate: album.releaseDate?.slice(0, 10) ?? existingRelease?.releaseDate ?? '',
-    year: parseInt(album.releaseDate?.slice(0, 4) ?? existingRelease?.year ?? '0', 10),
-    spotifyId: existingRelease?.spotifyId ?? null,
-    spotifyUrl: existingRelease?.spotifyUrl ?? null,
-    appleMusicUrl: album.collectionViewUrl ?? existingRelease?.appleMusicUrl ?? null,
-    amazonMusicUrl: existingRelease?.amazonMusicUrl ?? null,
-    youtubePlaylistUrl: existingRelease?.youtubePlaylistUrl ?? null,
-    youtubeUrl: existingRelease?.youtubeUrl ?? null,
+    title: firstSet(existingRelease?.title, cleanTitle(album.collectionName)),
+    releaseDate: firstSet(album.releaseDate?.slice(0, 10), existingRelease?.releaseDate, ''),
+    year: parseInt(firstSet(album.releaseDate?.slice(0, 4), existingRelease?.year, '0'), 10),
+    spotifyId: handFilled(existingRelease, 'spotifyId'),
+    spotifyUrl: handFilled(existingRelease, 'spotifyUrl'),
+    appleMusicUrl: firstSet(album.collectionViewUrl, existingRelease?.appleMusicUrl, null),
+    amazonMusicUrl: handFilled(existingRelease, 'amazonMusicUrl'),
+    youtubePlaylistUrl: handFilled(existingRelease, 'youtubePlaylistUrl'),
+    youtubeUrl: handFilled(existingRelease, 'youtubeUrl'),
     artworkUrl: largeArtworkUrl(album.artworkUrl100),
     artworkUrlSmall: smallArtworkUrl(album.artworkUrl100),
     totalTracks: trackCount,
@@ -203,46 +209,50 @@ export function buildRelease(album, trackItems, existingRelease) {
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
-async function main() {
-  console.log(`Looking up artist "${ARTIST_NAME}" on iTunes...`);
-  const artistId = await getArtistId();
-  console.log(`Found artist ID: ${artistId}`);
+/** Tracks for one album, or none (with a warning) if iTunes fails. */
+async function tracksOrNone(get, album, out) {
+  try {
+    return await getAlbumTracks(get, album.collectionId);
+  } catch (err) {
+    out.warn(`\n    Warning: could not fetch tracks (${err.message}). Continuing without track list.`);
+    return [];
+  }
+}
 
-  console.log('Fetching releases...');
-  const albums = await getArtistAlbums(artistId);
-  console.log(`Found ${albums.length} releases. Fetching track data...`);
+/**
+ * Fetch every Jade Three album from iTunes and merge it with the existing
+ * releases: one release per id, hand-added upcoming releases kept, newest first.
+ * `get` fetches and parses an iTunes URL; `pause` spaces out the requests.
+ */
+export async function syncReleases({ get, existing, today, pause = sleep, out = console }) {
+  out.log(`Looking up artist "${ARTIST_NAME}" on iTunes...`);
+  const artistId = await getArtistId(get);
+  out.log(`Found artist ID: ${artistId}`);
 
-  const existing = loadExisting();
-  let releases = [];
+  out.log('Fetching releases...');
+  const albums = await getArtistAlbums(get, artistId);
+  out.log(`Found ${albums.length} releases. Fetching track data...`);
 
+  const fetched = [];
   for (const album of albums) {
-    process.stdout.write(`  Processing "${album.collectionName}"...`);
-    await sleep(DELAY_MS);
-
-    let trackItems = [];
-    try {
-      trackItems = await getAlbumTracks(album.collectionId);
-    } catch (err) {
-      console.warn(`\n    Warning: could not fetch tracks (${err.message}). Continuing without track list.`);
-    }
-
-    releases.push(buildRelease(album, trackItems, findExistingRelease(existing, album.collectionName)));
-
-    console.log(' done');
+    out.log(`  Processing "${album.collectionName}"...`);
+    await pause(DELAY_MS);
+    const trackItems = await tracksOrNone(get, album, out);
+    fetched.push(buildRelease(album, trackItems, findExistingRelease(existing, album.collectionName)));
   }
 
-  releases = dedupeReleases(releases, existing.releases ?? []);
-  releases.push(...keepUnlistedUpcoming(releases, existing.releases ?? [], siteToday()));
+  const releases = dedupeReleases(fetched, existing, out.warn);
+  releases.push(...keepUnlistedUpcoming(releases, existing, today));
+  return releases.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
+}
 
-  // Sort newest first
-  releases.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
-
+async function main() {
+  const releases = await syncReleases({ get: itunesGet, existing: loadExisting(), today: siteToday() });
   const output = {
     lastUpdated: new Date().toISOString().slice(0, 10),
     artistName: 'Jade Three',
     releases,
   };
-
   writeFileSync(OUTPUT_PATH, JSON.stringify(output, null, 2) + '\n');
   console.log(`\nWrote ${releases.length} releases to ${OUTPUT_PATH}`);
   console.log('\nNext steps:');
