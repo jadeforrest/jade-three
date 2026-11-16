@@ -2,8 +2,8 @@
 # launchd: com.jade.jade3-to-bluesky (moved from ~/Library/Scripts/jade3-to-bluesky.sh so it is under git
 # and the fix-reported-errors task can patch it on a branch). Runs
 # scripts/post-clip.mjs with the repo's .env; failures are recorded and notified by
-# job-wrapper via ~/Developer/error-reporting, a missed run by its heartbeat.
-JOB_WRAPPER_LIB="${JOB_WRAPPER_LIB:-/Users/jade/Developer/job-wrapper/job-wrapper.sh}"
+# job-wrapper via error-reporting, a missed run by its heartbeat.
+JOB_WRAPPER_LIB="${JOB_WRAPPER_LIB:-$HOME/.local/lib/job-wrapper.sh}"
 [ -r "$JOB_WRAPPER_LIB" ] || { echo "FATAL: job-wrapper missing" >&2; exit 78; }
 . "$JOB_WRAPPER_LIB"
 

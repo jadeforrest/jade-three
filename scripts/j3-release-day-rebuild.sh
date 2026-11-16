@@ -1,9 +1,9 @@
 #!/bin/bash
 # launchd: com.jade.j3-release-day-rebuild. Runs scripts/j3-release-day-rebuild.mjs
 # daily with the repo's .env, so an upcoming release goes live on its date.
-# Failures are recorded and notified by job-wrapper via ~/Developer/error-reporting,
+# Failures are recorded and notified by job-wrapper via error-reporting,
 # a missed run by its heartbeat.
-JOB_WRAPPER_LIB="${JOB_WRAPPER_LIB:-/Users/jade/Developer/job-wrapper/job-wrapper.sh}"
+JOB_WRAPPER_LIB="${JOB_WRAPPER_LIB:-$HOME/.local/lib/job-wrapper.sh}"
 [ -r "$JOB_WRAPPER_LIB" ] || { echo "FATAL: job-wrapper missing" >&2; exit 78; }
 . "$JOB_WRAPPER_LIB"
 
